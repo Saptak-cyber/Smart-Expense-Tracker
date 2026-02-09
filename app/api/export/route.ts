@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '@/lib/auth-utils';
 import { exportParamsSchema, validateRequest } from '@/lib/validations';
 import { rateLimit, rateLimits } from '@/lib/rate-limit';
+import { getEnv } from '@/lib/env';
+
+const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
+const supabaseAnonKey = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+
+function getSupabaseAuthed(request: NextRequest) {
+  const token = request.headers.get('authorization')?.replace('Bearer ', '').trim();
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    },
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+}
 
 export async function POST(request: NextRequest) {
   // Apply rate limiting
@@ -12,7 +29,8 @@ export async function POST(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
   
-  const userId = auth.user.id;
+  const userId = auth.user!.id;
+  const supabase = getSupabaseAuthed(request);
   const body = await request.json();
   
   // Validate request body
@@ -29,7 +47,6 @@ export async function POST(request: NextRequest) {
   let query = supabase
     .from('expenses')
     .select('*, categories(*)')
-    .eq('user_id', userId)
     .order('date', { ascending: false });
 
   if (start_date) query = query.gte('date', start_date);

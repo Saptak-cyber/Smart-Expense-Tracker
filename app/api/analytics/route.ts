@@ -32,7 +32,6 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from('monthly_expense_summary')
       .select('*')
-      .eq('user_id', userId!)
       .order('month', { ascending: false })
       .limit(12);
 
@@ -47,7 +46,6 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from('category_breakdown')
       .select('*')
-      .eq('user_id', userId!)
       .order('total_amount', { ascending: false });
 
     if (error) {
