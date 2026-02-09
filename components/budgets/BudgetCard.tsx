@@ -72,9 +72,7 @@ export function BudgetCard({ budget, spent, onEdit, onDelete }: BudgetCardProps)
               ) : (
                 <>
                   <TrendingDown className="h-4 w-4" />
-                  <span className="text-sm font-medium">
-                    ₹{remaining.toLocaleString()} left
-                  </span>
+                  <span className="text-sm font-medium">₹{remaining.toLocaleString()} left</span>
                 </>
               )}
             </div>
@@ -83,9 +81,7 @@ export function BudgetCard({ budget, spent, onEdit, onDelete }: BudgetCardProps)
           <div className="space-y-1">
             <Progress value={Math.min(percentage, 100)} className="h-2" />
             <div className="flex justify-between items-center text-xs">
-              <span className={getStatusColor()}>
-                {percentage.toFixed(0)}% used
-              </span>
+              <span className={getStatusColor()}>{percentage.toFixed(0)}% used</span>
               {isNearLimit && !isOverBudget && (
                 <span className="flex items-center gap-1 text-yellow-500">
                   <AlertCircle className="h-3 w-3" />

@@ -12,12 +12,12 @@ function getSupabaseAuthed(request: NextRequest) {
   const token = request.headers.get('authorization')?.replace('Bearer ', '').trim();
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   });
 }
 
@@ -25,11 +25,8 @@ export async function GET(request: NextRequest) {
   // Use basic client for public categories
   const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
   const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey);
-  
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .order('name');
+
+  const { data, error } = await supabase.from('categories').select('*').order('name');
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -41,12 +38,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const rateLimitResult = await rateLimit(request, rateLimits.mutation);
   if (rateLimitResult) return rateLimitResult;
-  
+
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
 
   const body = await request.json();
-  
+
   // Validate request body
   const validation = await validateRequest(categorySchema, body);
   if (!validation.success) {
@@ -59,19 +56,16 @@ export async function POST(request: NextRequest) {
   // Use service role to bypass RLS for category creation (categories are global)
   const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
   const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  
+
   if (!supabaseServiceRoleKey) {
-    return NextResponse.json(
-      { error: 'Service configuration error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Service configuration error' }, { status: 500 });
   }
 
   const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceRoleKey, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   });
 
   const { data, error } = await supabaseAdmin

@@ -4,7 +4,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function generateInsight(prompt: string): Promise<string> {
   const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-  
+
   const result = await model.generateContent(prompt);
   const response = result.response;
   return response.text();
@@ -18,7 +18,7 @@ export function buildFinancialPrompt(
 ): string {
   const totalSpent = expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
   const avgExpense = expenses.length > 0 ? totalSpent / expenses.length : 0;
-  
+
   return `You are a financial assistant helping users understand their spending patterns.
 
 Context:

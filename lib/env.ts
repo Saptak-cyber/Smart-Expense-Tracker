@@ -5,10 +5,10 @@ const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url('Invalid Supabase URL'),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'Supabase Anon Key is required'),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'Supabase Service Role Key is required').optional(),
-  
+
   // AI
   GEMINI_API_KEY: z.string().min(1, 'Gemini API Key is required'),
-  
+
   // Node environment
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
@@ -51,10 +51,10 @@ export function getEnv<K extends keyof Env>(key: K): Env[K] {
     }
     return process.env[key] as Env[K];
   }
-  
+
   if (!(key in env)) {
     throw new Error(`Environment variable "${key}" is not defined`);
   }
-  
+
   return env[key];
 }

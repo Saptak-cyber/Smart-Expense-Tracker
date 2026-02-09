@@ -12,12 +12,12 @@ function getSupabaseAuthed(request: NextRequest) {
   const token = request.headers.get('authorization')?.replace('Bearer ', '').trim();
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   });
 }
 
@@ -25,14 +25,14 @@ export async function POST(request: NextRequest) {
   // Apply rate limiting
   const rateLimitResult = await rateLimit(request, rateLimits.export);
   if (rateLimitResult) return rateLimitResult;
-  
+
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const body = await request.json();
-  
+
   // Validate request body
   const validation = await validateRequest(exportParamsSchema, body);
   if (!validation.success) {
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  
+
   const { format, start_date, end_date, category_ids } = validation.data;
 
   let query = supabase
@@ -62,9 +62,10 @@ export async function POST(request: NextRequest) {
   if (format === 'csv') {
     const csv = [
       'Date,Amount,Category,Description',
-      ...expenses!.map(e => 
-        `${e.date},${e.amount},${e.categories?.name || 'Uncategorized'},"${e.description || ''}"`
-      )
+      ...expenses!.map(
+        (e) =>
+          `${e.date},${e.amount},${e.categories?.name || 'Uncategorized'},"${e.description || ''}"`
+      ),
     ].join('\n');
 
     return new NextResponse(csv, {

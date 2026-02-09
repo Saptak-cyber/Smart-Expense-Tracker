@@ -12,7 +12,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Budget, Category } from '@/types';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
@@ -58,17 +64,17 @@ export function BudgetModal({ isOpen, onClose, onSuccess, budget, categories }: 
 
     try {
       // Get the session and token
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Please log in to continue');
         return;
       }
-      
+
       const token = session.access_token;
-      const url = budget
-        ? `/api/budgets`
-        : `/api/budgets`;
-      
+      const url = budget ? `/api/budgets` : `/api/budgets`;
+
       const method = budget ? 'PUT' : 'POST';
       const body = budget
         ? { id: budget.id, ...formData, monthly_limit: parseFloat(formData.monthly_limit) }
@@ -104,9 +110,7 @@ export function BudgetModal({ isOpen, onClose, onSuccess, budget, categories }: 
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{budget ? 'Edit Budget' : 'Create Budget'}</DialogTitle>
-          <DialogDescription>
-            Set a monthly spending limit for a category
-          </DialogDescription>
+          <DialogDescription>Set a monthly spending limit for a category</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -173,11 +177,13 @@ export function BudgetModal({ isOpen, onClose, onSuccess, budget, categories }: 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
+                  {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map(
+                    (year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    )
+                  )}
                 </SelectContent>
               </Select>
             </div>

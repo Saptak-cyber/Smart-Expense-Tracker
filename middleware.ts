@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
 
   // Public routes
   const publicRoutes = ['/login', '/signup', '/', '/api/health'];
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
 
   if (!isPublicRoute && !token) {
     return NextResponse.redirect(new URL('/login', request.url));
@@ -18,7 +18,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/health).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*|api/health).*)'],
 };

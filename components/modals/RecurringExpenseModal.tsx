@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -41,21 +47,23 @@ export default function RecurringExpenseModal({
     setLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Please log in to continue');
         return;
       }
 
-      const payload = recurringExpense 
+      const payload = recurringExpense
         ? { ...formData, id: recurringExpense.id, amount: parseFloat(formData.amount) }
         : { ...formData, amount: parseFloat(formData.amount) };
 
       const response = await fetch('/api/recurring-expenses', {
         method: recurringExpense ? 'PUT' : 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(payload),
       });

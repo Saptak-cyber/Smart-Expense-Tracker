@@ -74,8 +74,14 @@ export default function LoginPage() {
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 -left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div
+          className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: '1s' }}
+        />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: '2s' }}
+        />
       </div>
 
       <div className="max-w-md w-full relative z-10">
@@ -84,7 +90,9 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl mb-4 shadow-lg shadow-purple-500/50">
             <TrendingUp className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">Smart Expense Tracker</h1>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
+            Smart Expense Tracker
+          </h1>
           <p className="text-slate-400">AI-powered financial insights</p>
         </div>
 
@@ -96,14 +104,19 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <Alert variant="destructive" className="mb-6 bg-red-500/10 border-red-500/50 text-red-400">
+            <Alert
+              variant="destructive"
+              className="mb-6 bg-red-500/10 border-red-500/50 text-red-400"
+            >
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-300">Email Address</Label>
+              <Label htmlFor="email" className="text-slate-300">
+                Email Address
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
                 <Input
@@ -120,13 +133,13 @@ export default function LoginPage() {
                   required
                 />
               </div>
-              {emailError && (
-                <p className="text-xs text-red-400 mt-1">{emailError}</p>
-              )}
+              {emailError && <p className="text-xs text-red-400 mt-1">{emailError}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-300">Password</Label>
+              <Label htmlFor="password" className="text-slate-300">
+                Password
+              </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
                 <Input
@@ -167,7 +180,10 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-400">
               Don&apos;t have an account?{' '}
-              <Link href="/signup" className="text-purple-400 hover:text-purple-300 font-medium transition">
+              <Link
+                href="/signup"
+                className="text-purple-400 hover:text-purple-300 font-medium transition"
+              >
                 Sign up for free
               </Link>
             </p>

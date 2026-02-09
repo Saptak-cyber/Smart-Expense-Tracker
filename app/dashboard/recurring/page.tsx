@@ -31,7 +31,9 @@ export default function RecurringExpensesPage() {
   }, []);
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       router.push('/login');
       return;
@@ -41,11 +43,13 @@ export default function RecurringExpensesPage() {
   };
 
   const loadRecurringExpenses = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) return;
 
     const response = await fetch('/api/recurring-expenses', {
-      headers: { 'Authorization': `Bearer ${session.access_token}` },
+      headers: { Authorization: `Bearer ${session.access_token}` },
     });
     if (response.ok) {
       const data = await response.json();
@@ -62,12 +66,14 @@ export default function RecurringExpensesPage() {
     if (!confirm('Are you sure you want to delete this recurring expense?')) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       const response = await fetch(`/api/recurring-expenses?id=${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${session.access_token}` },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
 
       if (!response.ok) {
@@ -83,14 +89,16 @@ export default function RecurringExpensesPage() {
 
   const handleToggleActive = async (expense: any) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       const response = await fetch('/api/recurring-expenses', {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           id: expense.id,
@@ -121,7 +129,12 @@ export default function RecurringExpensesPage() {
             <h1 className="text-3xl font-bold">Recurring Expenses</h1>
             <p className="text-muted-foreground">Automate your regular expenses</p>
           </div>
-          <Button onClick={() => { setSelectedExpense(null); setShowModal(true); }}>
+          <Button
+            onClick={() => {
+              setSelectedExpense(null);
+              setShowModal(true);
+            }}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Recurring Expense
           </Button>
@@ -202,11 +215,7 @@ export default function RecurringExpensesPage() {
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(expense.id)}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(expense.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
@@ -220,7 +229,9 @@ export default function RecurringExpensesPage() {
         <div className="rounded-lg border bg-card p-6">
           <h3 className="font-semibold mb-2">How it works</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• Recurring expenses automatically create new expenses based on the frequency you set</li>
+            <li>
+              • Recurring expenses automatically create new expenses based on the frequency you set
+            </li>
             <li>• You can pause or delete recurring expenses at any time</li>
             <li>• The system checks for due recurring expenses daily at midnight UTC</li>
             <li>• Set an end date if you want the recurring expense to stop automatically</li>

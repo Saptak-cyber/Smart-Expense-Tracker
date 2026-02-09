@@ -1,6 +1,16 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+} from 'recharts';
 import { format, startOfMonth, subMonths } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -10,11 +20,13 @@ export default function ExpenseChart({ expenses }: any) {
     return startOfMonth(date);
   });
 
-  const chartData = last6Months.map(month => {
+  const chartData = last6Months.map((month) => {
     const monthExpenses = expenses.filter((e: any) => {
       const expenseDate = new Date(e.date);
-      return expenseDate.getMonth() === month.getMonth() &&
-             expenseDate.getFullYear() === month.getFullYear();
+      return (
+        expenseDate.getMonth() === month.getMonth() &&
+        expenseDate.getFullYear() === month.getFullYear()
+      );
     });
 
     const total = monthExpenses.reduce((sum: number, e: any) => sum + parseFloat(e.amount), 0);
@@ -26,7 +38,7 @@ export default function ExpenseChart({ expenses }: any) {
   });
 
   const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
       return (
         <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3">
           <p className="font-semibold text-foreground">{payload[0].payload.month}</p>
@@ -49,17 +61,17 @@ export default function ExpenseChart({ expenses }: any) {
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-            <XAxis 
-              dataKey="month" 
+            <XAxis
+              dataKey="month"
               stroke="hsl(var(--muted-foreground))"
               tick={{ fill: 'hsl(var(--muted-foreground))' }}
             />
-            <YAxis 
+            <YAxis
               stroke="hsl(var(--muted-foreground))"
               tick={{ fill: 'hsl(var(--muted-foreground))' }}
               tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}k`}

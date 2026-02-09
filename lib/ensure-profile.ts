@@ -20,13 +20,13 @@ export async function ensureUserProfile(userId: string, email: string, fullName?
 
     // If profile doesn't exist, create it
     if (checkError && checkError.code === 'PGRST116') {
-      const { error: insertError } = await supabase
-        .from('profiles')
-        .insert([{
+      const { error: insertError } = await supabase.from('profiles').insert([
+        {
           id: userId,
           email: email,
           full_name: fullName || email.split('@')[0],
-        }]);
+        },
+      ]);
 
       if (insertError) {
         console.error('Error creating profile:', insertError);

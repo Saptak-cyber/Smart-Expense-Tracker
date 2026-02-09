@@ -1,6 +1,15 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { format, subMonths } from 'date-fns';
 
 interface SpendingTrendsProps {
@@ -18,12 +27,8 @@ export default function SpendingTrends({ data }: SpendingTrendsProps) {
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="month" 
-            stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
-          />
-          <YAxis 
+          <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickFormatter={(value) => `₹${value}`}
@@ -38,19 +43,19 @@ export default function SpendingTrends({ data }: SpendingTrendsProps) {
             formatter={(value: number) => [`₹${value.toFixed(2)}`, '']}
           />
           <Legend wrapperStyle={{ color: 'hsl(var(--foreground))' }} />
-          <Line 
-            type="monotone" 
-            dataKey="total" 
-            stroke="hsl(var(--primary))" 
+          <Line
+            type="monotone"
+            dataKey="total"
+            stroke="hsl(var(--primary))"
             strokeWidth={2}
             name="Spending"
             dot={{ fill: 'hsl(var(--primary))' }}
           />
-          {data.some(d => d.budget) && (
-            <Line 
-              type="monotone" 
-              dataKey="budget" 
-              stroke="hsl(var(--destructive))" 
+          {data.some((d) => d.budget) && (
+            <Line
+              type="monotone"
+              dataKey="budget"
+              stroke="hsl(var(--destructive))"
               strokeWidth={2}
               strokeDasharray="5 5"
               name="Budget"

@@ -13,19 +13,27 @@ interface InsightsPanelProps {
 export default function InsightsPanel({ insights }: InsightsPanelProps) {
   const getIcon = (type: string) => {
     switch (type) {
-      case 'positive': return <TrendingDown className="h-5 w-5 text-green-500" />;
-      case 'negative': return <TrendingUp className="h-5 w-5 text-destructive" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
-      default: return <Lightbulb className="h-5 w-5 text-primary" />;
+      case 'positive':
+        return <TrendingDown className="h-5 w-5 text-green-500" />;
+      case 'negative':
+        return <TrendingUp className="h-5 w-5 text-destructive" />;
+      case 'warning':
+        return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+      default:
+        return <Lightbulb className="h-5 w-5 text-primary" />;
     }
   };
 
   const getBorderColor = (type: string) => {
     switch (type) {
-      case 'positive': return 'border-l-green-500';
-      case 'negative': return 'border-l-destructive';
-      case 'warning': return 'border-l-yellow-500';
-      default: return 'border-l-primary';
+      case 'positive':
+        return 'border-l-green-500';
+      case 'negative':
+        return 'border-l-destructive';
+      case 'warning':
+        return 'border-l-yellow-500';
+      default:
+        return 'border-l-primary';
     }
   };
 
@@ -35,10 +43,10 @@ export default function InsightsPanel({ insights }: InsightsPanelProps) {
         <Lightbulb className="h-5 w-5 text-primary" />
         <h3 className="text-lg font-semibold">AI Insights</h3>
       </div>
-      
+
       <div className="space-y-3">
         {insights.map((insight, index) => (
-          <div 
+          <div
             key={index}
             className={`p-4 border-l-4 bg-muted/50 rounded-r ${getBorderColor(insight.type)}`}
           >

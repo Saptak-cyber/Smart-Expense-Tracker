@@ -10,19 +10,19 @@ function getSupabaseAuthed(request: NextRequest) {
   const token = request.headers.get('authorization')?.replace('Bearer ', '').trim();
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   });
 }
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id; // Added ! to fix TypeScript error
   const supabase = getSupabaseAuthed(request);
   const { searchParams } = new URL(request.url);

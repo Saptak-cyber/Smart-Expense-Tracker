@@ -11,6 +11,7 @@
 ## ✨ Key Features
 
 ### 💰 Complete Expense Management
+
 - Full CRUD operations with validation
 - Category organization with custom icons
 - Receipt upload with OCR text extraction
@@ -18,6 +19,7 @@
 - Infinite scroll pagination
 
 ### 🤖 AI-Powered Intelligence
+
 - **Conversational Chatbot** with voice input support
 - Natural language expense queries
 - Personalized financial insights
@@ -25,6 +27,7 @@
 - Smart categorization suggestions
 
 ### 📊 Advanced Analytics
+
 - Interactive spending trends charts
 - Category breakdown visualizations
 - Monthly comparisons & forecasts
@@ -33,6 +36,7 @@
 - Exportable reports (PDF/Excel)
 
 ### 🔄 Automation Features
+
 - **Recurring Expenses** (bills, subscriptions)
 - Auto-generation based on frequency
 - **Smart Alerts** at 75%, 90%, 100% budget
@@ -40,6 +44,7 @@
 - Email/SMS notifications
 
 ### 🎨 Modern UI/UX
+
 - Beautiful dark theme with glassmorphism
 - Sidebar navigation (fixed/collapsible)
 - Responsive mobile-first design
@@ -48,6 +53,7 @@
 - Purple/blue gradient branding
 
 ### 🛡️ Security & Performance
+
 - Input validation with Zod schemas
 - Rate limiting (100 req/min)
 - Row-level security (RLS)
@@ -68,6 +74,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+ and npm
 - Supabase account ([sign up free](https://supabase.com))
 - Google Gemini API key ([get one here](https://ai.google.dev))
@@ -133,6 +140,7 @@ lib/
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 3.4
@@ -142,6 +150,7 @@ lib/
 - **Forms**: React Hook Form + Zod
 
 ### Backend
+
 - **Database**: Supabase (PostgreSQL)
 - **Auth**: Supabase Auth
 - **Storage**: Supabase Storage
@@ -156,18 +165,18 @@ lib/
 
 ## 🎯 API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/expenses` | List expenses (paginated) |
-| POST | `/api/expenses` | Create expense |
-| PATCH | `/api/expenses` | Update expense |
-| DELETE | `/api/expenses` | Delete expense |
-| GET | `/api/analytics` | Get analytics data |
-| POST | `/api/budgets` | Create budget |
-| GET | `/api/alerts` | List alerts |
-| POST | `/api/ai/chat` | AI chatbot |
-| POST | `/api/receipts/upload` | Upload receipt with OCR |
-| POST | `/api/export` | Export expenses |
+| Method | Endpoint               | Description               |
+| ------ | ---------------------- | ------------------------- |
+| GET    | `/api/expenses`        | List expenses (paginated) |
+| POST   | `/api/expenses`        | Create expense            |
+| PATCH  | `/api/expenses`        | Update expense            |
+| DELETE | `/api/expenses`        | Delete expense            |
+| GET    | `/api/analytics`       | Get analytics data        |
+| POST   | `/api/budgets`         | Create budget             |
+| GET    | `/api/alerts`          | List alerts               |
+| POST   | `/api/ai/chat`         | AI chatbot                |
+| POST   | `/api/receipts/upload` | Upload receipt with OCR   |
+| POST   | `/api/export`          | Export expenses           |
 
 ## 🔐 Security Features
 
@@ -266,18 +275,21 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more details.
 ## Key Features Explained
 
 ### Database Architecture
+
 - **Row Level Security (RLS)** - Users can only access their own data
 - **Automatic profile creation** - Triggered on user signup
 - **Optimized views** - Pre-computed analytics for performance
 - **Budget alerts** - Automatic notifications when limits exceeded
 
 ### AI Integration
+
 - Uses Gemini 2.0 Flash for fast, accurate responses
 - Context-aware prompts with user spending data
 - Cached insights to reduce API calls
 - Non-judgmental, actionable advice
 
 ### Export System
+
 - CSV format with full transaction history
 - Filterable by date range and categories
 - Clean, professional formatting
@@ -285,17 +297,21 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more details.
 ## API Endpoints
 
 ### Expenses
+
 - `GET /api/expenses` - List expenses with filters
 - `POST /api/expenses` - Create new expense
 
 ### Analytics
+
 - `GET /api/analytics?type=monthly` - Monthly summary
 - `GET /api/analytics?type=categories` - Category breakdown
 
 ### AI
+
 - `POST /api/ai/chat` - Chat with AI assistant
 
 ### Export
+
 - `POST /api/export` - Generate CSV export
 
 ## Security

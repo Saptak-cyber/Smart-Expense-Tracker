@@ -8,7 +8,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, Loader2, Mail, Lock, User, Sparkles, TrendingUp, Check, X } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  Mail,
+  Lock,
+  User,
+  Sparkles,
+  TrendingUp,
+  Check,
+  X,
+} from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 export default function SignupPage() {
@@ -37,14 +48,14 @@ export default function SignupPage() {
 
   const getPasswordStrength = () => {
     if (!password) return { strength: 0, text: '', color: '' };
-    
+
     let strength = 0;
     if (password.length >= 8) strength += 25;
     if (password.length >= 12) strength += 25;
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
     if (/[0-9]/.test(password)) strength += 15;
     if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
-    
+
     if (strength < 40) return { strength, text: 'Weak', color: 'bg-red-500' };
     if (strength < 70) return { strength, text: 'Fair', color: 'bg-yellow-500' };
     if (strength < 90) return { strength, text: 'Good', color: 'bg-blue-500' };
@@ -110,8 +121,14 @@ export default function SignupPage() {
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div
+          className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: '1s' }}
+        />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: '2s' }}
+        />
       </div>
 
       <div className="max-w-md w-full relative z-10">
@@ -120,7 +137,9 @@ export default function SignupPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4 shadow-lg shadow-blue-500/50">
             <TrendingUp className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">Smart Expense Tracker</h1>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+            Smart Expense Tracker
+          </h1>
           <p className="text-slate-400">Start your journey to financial freedom</p>
         </div>
 
@@ -132,14 +151,19 @@ export default function SignupPage() {
           </div>
 
           {error && (
-            <Alert variant="destructive" className="mb-6 bg-red-500/10 border-red-500/50 text-red-400">
+            <Alert
+              variant="destructive"
+              className="mb-6 bg-red-500/10 border-red-500/50 text-red-400"
+            >
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
           <form onSubmit={handleSignup} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-slate-300">Full Name</Label>
+              <Label htmlFor="fullName" className="text-slate-300">
+                Full Name
+              </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
                 <Input
@@ -155,7 +179,9 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-300">Email Address</Label>
+              <Label htmlFor="email" className="text-slate-300">
+                Email Address
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
                 <Input
@@ -172,13 +198,13 @@ export default function SignupPage() {
                   required
                 />
               </div>
-              {emailError && (
-                <p className="text-xs text-red-400 mt-1">{emailError}</p>
-              )}
+              {emailError && <p className="text-xs text-red-400 mt-1">{emailError}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-300">Password</Label>
+              <Label htmlFor="password" className="text-slate-300">
+                Password
+              </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
                 <Input
@@ -198,23 +224,28 @@ export default function SignupPage() {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              
+
               {/* Password Strength Indicator */}
               {password && (
                 <div className="space-y-2 mt-3">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-400">Password strength:</span>
-                    <span className={`font-medium ${
-                      passwordStrength.text === 'Weak' ? 'text-red-400' :
-                      passwordStrength.text === 'Fair' ? 'text-yellow-400' :
-                      passwordStrength.text === 'Good' ? 'text-blue-400' :
-                      'text-green-400'
-                    }`}>
+                    <span
+                      className={`font-medium ${
+                        passwordStrength.text === 'Weak'
+                          ? 'text-red-400'
+                          : passwordStrength.text === 'Fair'
+                            ? 'text-yellow-400'
+                            : passwordStrength.text === 'Good'
+                              ? 'text-blue-400'
+                              : 'text-green-400'
+                      }`}
+                    >
                       {passwordStrength.text}
                     </span>
                   </div>
                   <Progress value={passwordStrength.strength} className="h-1.5" />
-                  
+
                   <div className="space-y-1.5 mt-3">
                     {passwordRequirements.map((req, index) => (
                       <div key={index} className="flex items-center gap-2 text-xs">
@@ -223,7 +254,9 @@ export default function SignupPage() {
                         ) : (
                           <X className="h-3.5 w-3.5 text-slate-600" />
                         )}
-                        <span className={req.met ? 'text-slate-300' : 'text-slate-500'}>{req.text}</span>
+                        <span className={req.met ? 'text-slate-300' : 'text-slate-500'}>
+                          {req.text}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -250,7 +283,10 @@ export default function SignupPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-400">
               Already have an account?{' '}
-              <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium transition">
+              <Link
+                href="/login"
+                className="text-blue-400 hover:text-blue-300 font-medium transition"
+              >
                 Sign in
               </Link>
             </p>

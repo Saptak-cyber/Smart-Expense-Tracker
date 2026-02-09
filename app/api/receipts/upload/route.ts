@@ -6,22 +6,25 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import { getEnv } from '@/lib/env';
 
 const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+const supabaseServiceKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
 // Use service role for storage operations (bypass RLS)
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 // Extract text from image using Tesseract.js
 async function extractTextFromImage(imageBuffer: ArrayBuffer): Promise<string> {
   const worker = await createWorker('eng');
-  
+
   try {
-    const { data: { text } } = await worker.recognize(Buffer.from(imageBuffer));
+    const {
+      data: { text },
+    } = await worker.recognize(Buffer.from(imageBuffer));
     return text;
   } finally {
     await worker.terminate();
@@ -34,11 +37,12 @@ function parseReceiptText(text: string): {
   date: string | null;
   merchant: string | null;
 } {
-  const lines = text.split('\n').filter(line => line.trim());
-  
+  const lines = text.split('\n').filter((line) => line.trim());
+
   // Extract amount (look for currency symbols and numbers)
   let amount: number | null = null;
-  const amountRegex = /(?:₹|Rs\.?|INR)\s*(\d+(?:,\d+)*(?:\.\d{2})?)|(\d+(?:,\d+)*(?:\.\d{2})?)\s*(?:₹|Rs\.?|INR)/i;
+  const amountRegex =
+    /(?:₹|Rs\.?|INR)\s*(\d+(?:,\d+)*(?:\.\d{2})?)|(\d+(?:,\d+)*(?:\.\d{2})?)\s*(?:₹|Rs\.?|INR)/i;
   for (const line of lines) {
     const match = line.match(amountRegex);
     if (match) {
@@ -47,7 +51,7 @@ function parseReceiptText(text: string): {
       break;
     }
   }
-  
+
   // Extract date
   let date: string | null = null;
   const dateRegex = /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/;
@@ -60,10 +64,10 @@ function parseReceiptText(text: string): {
       break;
     }
   }
-  
+
   // Extract merchant (usually the first few lines)
   const merchant = lines.slice(0, 2).join(' ').substring(0, 100) || null;
-  
+
   return { amount, date, merchant };
 }
 
@@ -77,7 +81,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    
+
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
@@ -93,15 +97,12 @@ export async function POST(request: NextRequest) {
 
     // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 5MB' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'File too large. Maximum size is 5MB' }, { status: 400 });
     }
 
     const userId = auth.user!.id;
     const fileName = `${userId}/${Date.now()}_${file.name}`;
-    
+
     // Upload to Supabase Storage
     const arrayBuffer = await file.arrayBuffer();
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
@@ -117,9 +118,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Get public URL
-    const { data: { publicUrl } } = supabaseAdmin.storage
-      .from('receipts')
-      .getPublicUrl(fileName);
+    const {
+      data: { publicUrl },
+    } = supabaseAdmin.storage.from('receipts').getPublicUrl(fileName);
 
     // Perform OCR if it's an image
     let ocrData = null;
@@ -160,15 +161,13 @@ export async function DELETE(request: NextRequest) {
   }
 
   const userId = auth.user!.id;
-  
+
   // Verify the file belongs to the user
   if (!fileName.startsWith(`${userId}/`)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
 
-  const { error } = await supabaseAdmin.storage
-    .from('receipts')
-    .remove([fileName]);
+  const { error } = await supabaseAdmin.storage.from('receipts').remove([fileName]);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

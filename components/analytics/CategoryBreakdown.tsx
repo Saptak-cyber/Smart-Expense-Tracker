@@ -22,7 +22,7 @@ export default function CategoryBreakdown({ data }: CategoryBreakdownProps) {
   return (
     <div className="p-6 bg-card rounded-lg border">
       <h3 className="text-lg font-semibold mb-4">Category Breakdown</h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>

@@ -63,10 +63,7 @@ export async function DELETE(request: NextRequest) {
 
   const userId = auth.user!.id;
 
-  const { error } = await supabase
-    .from('chat_history')
-    .delete()
-    .eq('user_id', userId);
+  const { error } = await supabase.from('chat_history').delete().eq('user_id', userId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

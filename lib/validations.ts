@@ -15,7 +15,10 @@ export const updateExpenseSchema = expenseSchema.partial().extend({
 // Budget validation schema
 export const budgetSchema = z.object({
   category_id: z.string().uuid('Invalid category ID'),
-  monthly_limit: z.number().positive('Monthly limit must be positive').max(100000000, 'Limit too large'),
+  monthly_limit: z
+    .number()
+    .positive('Monthly limit must be positive')
+    .max(100000000, 'Limit too large'),
   month: z.number().int().min(1).max(12, 'Month must be between 1 and 12'),
   year: z.number().int().min(2020).max(2100, 'Year must be between 2020 and 2100'),
 });
@@ -27,8 +30,14 @@ export const updateBudgetSchema = budgetSchema.partial().extend({
 // Export parameters schema
 export const exportParamsSchema = z.object({
   format: z.enum(['csv', 'pdf'], { message: 'Format must be csv or pdf' }),
-  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  start_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  end_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   category_ids: z.array(z.string().uuid()).optional(),
 });
 
@@ -43,15 +52,24 @@ export const userSettingsSchema = z.object({
 // AI chat schema
 export const aiChatSchema = z.object({
   query: z.string().min(1, 'Query cannot be empty').max(1000, 'Query too long'),
-  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  start_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  end_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 // Category schema
 export const categorySchema = z.object({
   name: z.string().min(1).max(50, 'Category name too long'),
   icon: z.string().max(50).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format').optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format')
+    .optional(),
 });
 
 // Recurring expense schema
@@ -60,10 +78,14 @@ export const recurringExpenseSchema = z.object({
   category_id: z.string().uuid('Invalid category ID'),
   description: z.string().max(500, 'Description too long').optional().nullable(),
   frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly'], {
-    message: 'Frequency must be daily, weekly, monthly, or yearly'
+    message: 'Frequency must be daily, weekly, monthly, or yearly',
   }),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
-  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional().nullable(),
+  end_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)')
+    .optional()
+    .nullable(),
   is_active: z.boolean().default(true),
 });
 

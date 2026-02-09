@@ -2,13 +2,10 @@
 const nextConfig = {
   // Output standalone for Docker
   output: 'standalone',
-  
+
   // Image optimization
   images: {
-    domains: [
-      'supabase.co',
-      '*.supabase.co',
-    ],
+    domains: ['supabase.co', '*.supabase.co'],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,
   },
@@ -21,31 +18,31 @@ const nextConfig = {
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
-            value: 'on'
+            value: 'on',
           },
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
+            value: 'max-age=63072000; includeSubDomains; preload',
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            value: 'nosniff',
           },
           {
             key: 'X-XSS-Protection',
-            value: '1; mode=block'
+            value: '1; mode=block',
           },
           {
             key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
+            value: 'strict-origin-when-cross-origin',
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(self), geolocation=()'
+            value: 'camera=(), microphone=(self), geolocation=()',
           },
           {
             key: 'Content-Security-Policy',
@@ -58,9 +55,9 @@ const nextConfig = {
               "connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com",
               "frame-ancestors 'self'",
               "base-uri 'self'",
-              "form-action 'self'"
-            ].join('; ')
-          }
+              "form-action 'self'",
+            ].join('; '),
+          },
         ],
       },
     ];
@@ -85,9 +82,7 @@ const nextConfig = {
             lib: {
               test: /[\\/]node_modules[\\/]/,
               name(module) {
-                const packageName = module.context.match(
-                  /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-                )[1];
+                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
                 return `npm.${packageName.replace('@', '')}`;
               },
               priority: 10,
@@ -96,7 +91,7 @@ const nextConfig = {
         },
       };
     }
-    
+
     return config;
   },
 

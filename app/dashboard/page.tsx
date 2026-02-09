@@ -23,14 +23,16 @@ export default function DashboardPage() {
   }, []);
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       router.push('/login');
       return;
     }
-    
+
     await ensureUserProfile(user.id, user.email!, user.user_metadata?.full_name);
-    
+
     setUser(user);
     loadExpenses(user.id);
   };
@@ -53,12 +55,7 @@ export default function DashboardPage() {
         <div className="space-y-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <EnhancedStatsCard
-                key={i}
-                title="Loading..."
-                value="--"
-                loading={true}
-              />
+              <EnhancedStatsCard key={i} title="Loading..." value="--" loading={true} />
             ))}
           </div>
         </div>
@@ -67,28 +64,30 @@ export default function DashboardPage() {
   }
 
   const totalSpent = expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
-  
+
   const now = new Date();
-  const thisMonth = expenses.filter(e => {
+  const thisMonth = expenses.filter((e) => {
     const expenseDate = new Date(e.date);
-    return expenseDate.getMonth() === now.getMonth() && 
-           expenseDate.getFullYear() === now.getFullYear();
+    return (
+      expenseDate.getMonth() === now.getMonth() && expenseDate.getFullYear() === now.getFullYear()
+    );
   });
   const monthlyTotal = thisMonth.reduce((sum, e) => sum + parseFloat(e.amount), 0);
-  
-  const lastMonth = expenses.filter(e => {
+
+  const lastMonth = expenses.filter((e) => {
     const expenseDate = new Date(e.date);
     const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    return expenseDate.getMonth() === lastMonthDate.getMonth() && 
-           expenseDate.getFullYear() === lastMonthDate.getFullYear();
+    return (
+      expenseDate.getMonth() === lastMonthDate.getMonth() &&
+      expenseDate.getFullYear() === lastMonthDate.getFullYear()
+    );
   });
   const lastMonthTotal = lastMonth.reduce((sum, e) => sum + parseFloat(e.amount), 0);
-  
-  const monthlyTrend = lastMonthTotal > 0 
-    ? ((monthlyTotal - lastMonthTotal) / lastMonthTotal) * 100 
-    : 0;
 
-  const thisWeek = expenses.filter(e => {
+  const monthlyTrend =
+    lastMonthTotal > 0 ? ((monthlyTotal - lastMonthTotal) / lastMonthTotal) * 100 : 0;
+
+  const thisWeek = expenses.filter((e) => {
     const expenseDate = new Date(e.date);
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     return expenseDate >= oneWeekAgo;
@@ -97,7 +96,7 @@ export default function DashboardPage() {
 
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(now.getTime() - (6 - i) * 24 * 60 * 60 * 1000);
-    const dayExpenses = expenses.filter(e => {
+    const dayExpenses = expenses.filter((e) => {
       const expenseDate = new Date(e.date);
       return expenseDate.toDateString() === date.toDateString();
     });
@@ -115,11 +114,15 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-            <p className="text-slate-400 mt-1">Welcome back, {user?.user_metadata?.full_name || user?.email}</p>
+            <p className="text-slate-400 mt-1">
+              Welcome back, {user?.user_metadata?.full_name || user?.email}
+            </p>
           </div>
           <div className="text-right">
             <p className="text-sm text-slate-500">Current Period</p>
-            <p className="text-lg font-semibold text-white">{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+            <p className="text-lg font-semibold text-white">
+              {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </p>
           </div>
         </div>
 

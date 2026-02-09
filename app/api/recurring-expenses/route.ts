@@ -12,12 +12,12 @@ function getSupabaseAuthed(request: NextRequest) {
   const token = request.headers.get('authorization')?.replace('Bearer ', '').trim();
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   });
 }
 
@@ -160,10 +160,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Recurring expense not found' }, { status: 404 });
   }
 
-  const { error } = await supabase
-    .from('recurring_expenses')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from('recurring_expenses').delete().eq('id', id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

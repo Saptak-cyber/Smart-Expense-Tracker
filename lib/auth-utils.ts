@@ -4,13 +4,14 @@ import { getEnv } from './env';
 
 // Server-side Supabase client for auth validation
 const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+const supabaseServiceKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 export interface AuthUser {
@@ -26,8 +27,8 @@ export interface AuthUser {
 export async function validateAuthToken(request: NextRequest): Promise<AuthUser | null> {
   try {
     const authHeader = request.headers.get('authorization');
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+
+    if (!authHeader?.startsWith('Bearer ')) {
       console.log('Missing or invalid Authorization header');
       return null;
     }
@@ -41,7 +42,10 @@ export async function validateAuthToken(request: NextRequest): Promise<AuthUser 
     }
 
     // Verify the JWT token
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    const {
+      data: { user },
+      error,
+    } = await supabaseAdmin.auth.getUser(token);
 
     if (error || !user) {
       console.error('Auth validation error:', error?.message || 'Unknown error');
@@ -50,7 +54,7 @@ export async function validateAuthToken(request: NextRequest): Promise<AuthUser 
 
     return {
       id: user.id,
-      email: user.email
+      email: user.email,
     };
   } catch (error) {
     console.error('Error validating auth token:', error);
@@ -64,17 +68,14 @@ export async function validateAuthToken(request: NextRequest): Promise<AuthUser 
  */
 export async function requireAuth(request: NextRequest) {
   const user = await validateAuthToken(request);
-  
+
   if (!user) {
     return {
       error: true,
-      response: new Response(
-        JSON.stringify({ error: 'Unauthorized - Invalid or missing token' }),
-        { 
-          status: 401,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      )
+      response: new Response(JSON.stringify({ error: 'Unauthorized - Invalid or missing token' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      }),
     };
   }
 

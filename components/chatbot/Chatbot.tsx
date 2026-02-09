@@ -5,7 +5,7 @@ import { X, Send } from 'lucide-react';
 
 export default function Chatbot({ user, onClose }: any) {
   const [messages, setMessages] = useState<any[]>([
-    { role: 'assistant', content: 'Hi! Ask me about your spending patterns.' }
+    { role: 'assistant', content: 'Hi! Ask me about your spending patterns.' },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ export default function Chatbot({ user, onClose }: any) {
     if (!input.trim()) return;
 
     const userMessage = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setLoading(true);
 
@@ -29,9 +29,12 @@ export default function Chatbot({ user, onClose }: any) {
       });
 
       const data = await response.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.response }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, something went wrong.' }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Sorry, something went wrong.' },
+      ]);
     }
 
     setLoading(false);
@@ -57,9 +60,7 @@ export default function Chatbot({ user, onClose }: any) {
           >
             <div
               className={`max-w-[80%] rounded-lg p-3 ${
-                msg.role === 'user'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
+                msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'
               }`}
             >
               {msg.content}
@@ -68,9 +69,7 @@ export default function Chatbot({ user, onClose }: any) {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 rounded-lg p-3 text-gray-500">
-              Thinking...
-            </div>
+            <div className="bg-gray-100 rounded-lg p-3 text-gray-500">Thinking...</div>
           </div>
         )}
       </div>
@@ -94,7 +93,7 @@ export default function Chatbot({ user, onClose }: any) {
           </button>
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
-          {['Why did I spend more?', 'Where can I save?', 'Predict next month'].map(q => (
+          {['Why did I spend more?', 'Where can I save?', 'Predict next month'].map((q) => (
             <button
               key={q}
               onClick={() => setInput(q)}

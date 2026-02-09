@@ -5,7 +5,7 @@ import { requireAuth } from '@/lib/auth-utils';
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const { searchParams } = new URL(request.url);
   const unreadOnly = searchParams.get('unread_only') === 'true';
@@ -48,7 +48,7 @@ export async function PATCH(request: NextRequest) {
     .select('user_id')
     .eq('id', alert_id)
     .single();
-    
+
   if (!existing || existing.user_id !== userId) {
     return NextResponse.json({ error: 'Alert not found' }, { status: 404 });
   }
@@ -74,26 +74,23 @@ export async function DELETE(request: NextRequest) {
   const userId = auth.user!.id;
   const { searchParams } = new URL(request.url);
   const alertId = searchParams.get('id');
-  
+
   if (!alertId) {
     return NextResponse.json({ error: 'Alert ID required' }, { status: 400 });
   }
-  
+
   // Verify alert belongs to user
   const { data: existing } = await supabase
     .from('alerts')
     .select('user_id')
     .eq('id', alertId)
     .single();
-    
+
   if (!existing || existing.user_id !== userId) {
     return NextResponse.json({ error: 'Alert not found' }, { status: 404 });
   }
 
-  const { error } = await supabase
-    .from('alerts')
-    .delete()
-    .eq('id', alertId);
+  const { error } = await supabase.from('alerts').delete().eq('id', alertId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

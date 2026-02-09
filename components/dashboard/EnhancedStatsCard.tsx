@@ -31,19 +31,19 @@ export default function EnhancedStatsCard({
   // Simple sparkline path generation
   const generateSparkline = (data: number[]) => {
     if (!data || data.length === 0) return '';
-    
+
     const width = 100;
     const height = 40;
     const max = Math.max(...data);
     const min = Math.min(...data);
     const range = max - min || 1;
-    
+
     const points = data.map((value, index) => {
       const x = (index / (data.length - 1)) * width;
       const y = height - ((value - min) / range) * height;
       return `${x},${y}`;
     });
-    
+
     return `M ${points.join(' L ')}`;
   };
 
@@ -60,13 +60,17 @@ export default function EnhancedStatsCard({
             <p className="text-sm font-medium text-slate-400">{title}</p>
           </div>
         </div>
-        
+
         {trend !== undefined && (
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${
-            isPositive ? 'bg-green-500/10 text-green-400' :
-            isNegative ? 'bg-red-500/10 text-red-400' :
-            'bg-slate-500/10 text-slate-400'
-          }`}>
+          <div
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium ${
+              isPositive
+                ? 'bg-green-500/10 text-green-400'
+                : isNegative
+                  ? 'bg-red-500/10 text-red-400'
+                  : 'bg-slate-500/10 text-slate-400'
+            }`}
+          >
             {isPositive && <ArrowUpRight className="h-3 w-3" />}
             {isNegative && <ArrowDownRight className="h-3 w-3" />}
             {isNeutral && <Minus className="h-3 w-3" />}
@@ -81,14 +85,13 @@ export default function EnhancedStatsCard({
         ) : (
           <div className="flex items-baseline gap-2">
             <h3 className="text-3xl font-bold text-white">
-              {prefix}{value}
+              {prefix}
+              {value}
             </h3>
           </div>
         )}
 
-        {subtitle && (
-          <p className="text-sm text-slate-500">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
 
         {/* Sparkline */}
         {sparklineData && sparklineData.length > 0 && (
@@ -106,14 +109,14 @@ export default function EnhancedStatsCard({
                   <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
                 </linearGradient>
               </defs>
-              
+
               {/* Area under curve */}
               <path
                 d={`${generateSparkline(sparklineData)} L 100,40 L 0,40 Z`}
                 fill={`url(#gradient-${title})`}
                 className="opacity-30"
               />
-              
+
               {/* Line */}
               <path
                 d={generateSparkline(sparklineData)}

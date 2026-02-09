@@ -22,7 +22,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [profileForm, setProfileForm] = useState({
     full_name: '',
     email: '',
@@ -40,10 +40,14 @@ export default function SettingsPage() {
 
   const fetchData = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setUser(user);
 
       const token = session.access_token;
@@ -76,7 +80,9 @@ export default function SettingsPage() {
     setSaving(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       const response = await fetch('/api/profile', {
@@ -105,7 +111,9 @@ export default function SettingsPage() {
     e.preventDefault();
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       const response = await fetch('/api/categories', {
@@ -147,7 +155,9 @@ export default function SettingsPage() {
 
     setUploading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       // Upload to Supabase Storage
@@ -162,9 +172,9 @@ export default function SettingsPage() {
       if (uploadError) throw uploadError;
 
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('receipts')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('receipts').getPublicUrl(filePath);
 
       // Update profile with avatar URL via API (which uses service role if needed)
       const response = await fetch('/api/profile', {
@@ -207,166 +217,167 @@ export default function SettingsPage() {
   return (
     <ModernLayout user={user}>
       <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and preferences</p>
-      </div>
+        <div>
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground">Manage your account and preferences</p>
+        </div>
 
-      <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="profile">
-            <User className="h-4 w-4 mr-2" />
-            Profile
-          </TabsTrigger>
-          <TabsTrigger value="categories">
-            <Palette className="h-4 w-4 mr-2" />
-            Categories
-          </TabsTrigger>
-          <TabsTrigger value="preferences">
-            <Settings className="h-4 w-4 mr-2" />
-            Preferences
-          </TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="profile" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="profile">
+              <User className="h-4 w-4 mr-2" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="categories">
+              <Palette className="h-4 w-4 mr-2" />
+              Categories
+            </TabsTrigger>
+            <TabsTrigger value="preferences">
+              <Settings className="h-4 w-4 mr-2" />
+              Preferences
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="profile" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your personal information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={profile?.avatar_url || undefined} />
-                  <AvatarFallback className="text-lg">
-                    {profile?.full_name?.charAt(0).toUpperCase() || profile?.email?.charAt(0).toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <input
-                    ref={avatarInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                    className="hidden"
-                  />
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => avatarInputRef.current?.click()}
-                    disabled={uploading}
-                  >
-                    <Upload className="h-4 w-4 mr-2" />
-                    {uploading ? 'Uploading...' : 'Change Avatar'}
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG. Max 2MB</p>
-                </div>
-              </div>
-
-              <Separator />
-
-              <form onSubmit={handleUpdateProfile} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name</Label>
-                  <Input
-                    id="full_name"
-                    value={profileForm.full_name}
-                    onChange={(e) => setProfileForm({ ...profileForm, full_name: e.target.value })}
-                    placeholder="John Doe"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={profileForm.email}
-                    disabled
-                    className="bg-muted"
-                  />
-                  <p className="text-xs text-muted-foreground">Email cannot be changed</p>
-                </div>
-
-                <Button type="submit" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="categories" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Custom Categories</CardTitle>
-              <CardDescription>Create custom expense categories</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <form onSubmit={handleAddCategory} className="space-y-4">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="col-span-2 space-y-2">
-                    <Label htmlFor="category_name">Category Name</Label>
-                    <Input
-                      id="category_name"
-                      value={newCategory.name}
-                      onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                      placeholder="e.g., Gym Membership"
-                      required
+          <TabsContent value="profile" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Information</CardTitle>
+                <CardDescription>Update your personal information</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={profile?.avatar_url || undefined} />
+                    <AvatarFallback className="text-lg">
+                      {profile?.full_name?.charAt(0).toUpperCase() ||
+                        profile?.email?.charAt(0).toUpperCase() ||
+                        'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="category_color">Color</Label>
-                    <Input
-                      id="category_color"
-                      type="color"
-                      value={newCategory.color}
-                      onChange={(e) => setNewCategory({ ...newCategory, color: e.target.value })}
-                      className="h-10"
-                    />
-                  </div>
-                </div>
-
-                <Button type="submit">Add Category</Button>
-              </form>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <h4 className="font-medium">Existing Categories</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {categories.map((category) => (
-                    <div
-                      key={category.id}
-                      className="flex items-center gap-2 p-2 rounded border"
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={uploading}
                     >
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: category.color || '#6366f1' }}
-                      />
-                      <span className="text-sm">{category.name}</span>
-                    </div>
-                  ))}
+                      <Upload className="h-4 w-4 mr-2" />
+                      {uploading ? 'Uploading...' : 'Change Avatar'}
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-1">JPG, PNG. Max 2MB</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        <TabsContent value="preferences" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Preferences</CardTitle>
-              <CardDescription>Customize your experience</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Additional preferences coming soon...
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                <Separator />
+
+                <form onSubmit={handleUpdateProfile} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="full_name">Full Name</Label>
+                    <Input
+                      id="full_name"
+                      value={profileForm.full_name}
+                      onChange={(e) =>
+                        setProfileForm({ ...profileForm, full_name: e.target.value })
+                      }
+                      placeholder="John Doe"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={profileForm.email}
+                      disabled
+                      className="bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+                  </div>
+
+                  <Button type="submit" disabled={saving}>
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="categories" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Custom Categories</CardTitle>
+                <CardDescription>Create custom expense categories</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <form onSubmit={handleAddCategory} className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="col-span-2 space-y-2">
+                      <Label htmlFor="category_name">Category Name</Label>
+                      <Input
+                        id="category_name"
+                        value={newCategory.name}
+                        onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                        placeholder="e.g., Gym Membership"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="category_color">Color</Label>
+                      <Input
+                        id="category_color"
+                        type="color"
+                        value={newCategory.color}
+                        onChange={(e) => setNewCategory({ ...newCategory, color: e.target.value })}
+                        className="h-10"
+                      />
+                    </div>
+                  </div>
+
+                  <Button type="submit">Add Category</Button>
+                </form>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <h4 className="font-medium">Existing Categories</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {categories.map((category) => (
+                      <div key={category.id} className="flex items-center gap-2 p-2 rounded border">
+                        <div
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: category.color || '#6366f1' }}
+                        />
+                        <span className="text-sm">{category.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="preferences" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Preferences</CardTitle>
+                <CardDescription>Customize your experience</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Additional preferences coming soon...
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </ModernLayout>
   );

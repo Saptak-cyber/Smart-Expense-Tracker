@@ -15,9 +15,7 @@ export default function StatsCard({ title, value, subtitle, trend }: any) {
           <p className="text-3xl font-bold text-gray-900">{value}</p>
           <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
         </div>
-        {trend && (
-          <span className="text-sm font-medium text-emerald-600">{trend}</span>
-        )}
+        {trend && <span className="text-sm font-medium text-emerald-600">{trend}</span>}
       </div>
     </motion.div>
   );

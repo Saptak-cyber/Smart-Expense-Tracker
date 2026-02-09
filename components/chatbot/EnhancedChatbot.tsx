@@ -52,7 +52,7 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = false;
-      
+
       recognitionRef.current.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         setInput(transcript);
@@ -73,12 +73,14 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
   const loadHistory = async () => {
     setLoadingHistory(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       const response = await fetch('/api/chat-history?limit=50', {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
       if (response.ok) {
@@ -94,14 +96,16 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
 
   const saveMessage = async (role: 'user' | 'assistant', content: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       await fetch('/api/chat-history', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ role, content }),
       });
@@ -120,15 +124,17 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
       created_at: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     saveMessage('user', input);
-    
+
     const query = input;
     setInput('');
     setLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Please sign in to use the assistant');
         setLoading(false);
@@ -139,7 +145,7 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ query }),
       });
@@ -158,7 +164,7 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
         created_at: new Date().toISOString(),
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, assistantMessage]);
       saveMessage('assistant', data.response);
     } catch (error: any) {
       console.error('Chat error:', error);
@@ -168,7 +174,7 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
         content: 'Sorry, I encountered an error. Please try again.',
         created_at: new Date().toISOString(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
       toast.error(error.message || 'Failed to get AI response');
     } finally {
       setLoading(false);
@@ -194,13 +200,15 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
     if (!confirm('Are you sure you want to clear all chat history?')) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       const response = await fetch('/api/chat-history', {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
       if (response.ok) {
@@ -214,7 +222,7 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
 
   const quickPrompts = [
     'How much did I spend this month?',
-    'What\'s my top spending category?',
+    "What's my top spending category?",
     'Show my budget status',
     'Analyze my spending trends',
   ];
@@ -252,7 +260,7 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
                 Ask me anything about your expenses, budgets, or financial trends
               </p>
               <div className="grid grid-cols-2 gap-2 max-w-md">
-                {quickPrompts.map(prompt => (
+                {quickPrompts.map((prompt) => (
                   <Button
                     key={prompt}
                     variant="outline"
@@ -274,9 +282,7 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
                 >
                   <div
                     className={`max-w-[80%] rounded-lg p-4 ${
-                      msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
+                      msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -313,13 +319,17 @@ export default function EnhancedChatbot({ isOpen, onClose, user }: ChatbotProps)
               {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
             </Button>
             <Button onClick={handleSend} disabled={loading || !input.trim()}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
             </Button>
           </div>
 
           {messages.length === 0 && (
             <div className="flex flex-wrap gap-2">
-              {quickPrompts.map(prompt => (
+              {quickPrompts.map((prompt) => (
                 <button
                   key={prompt}
                   onClick={() => setInput(prompt)}

@@ -9,7 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 
 export default function AddExpenseModal({ user, categories, onClose, onSuccess }: any) {
@@ -45,7 +51,9 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
 
     try {
       // Get session token
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Please log in to upload receipts');
         return;
@@ -57,7 +65,7 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
       const response = await fetch('/api/receipts/upload', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: formData,
       });
@@ -99,7 +107,7 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileChange(files[0]);
@@ -114,16 +122,16 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
       // Ensure user profile exists (fallback)
       await ensureUserProfile(user.id, user.email, user.user_metadata?.full_name);
 
-      const { error: insertError } = await supabase
-        .from('expenses')
-        .insert([{
+      const { error: insertError } = await supabase.from('expenses').insert([
+        {
           user_id: user.id,
           amount: parseFloat(amount),
           category_id: categoryId || null,
           description,
           date,
           receipt_url: receiptUrl || null,
-        }]);
+        },
+      ]);
 
       if (insertError) {
         toast.error(insertError.message);
@@ -155,9 +163,7 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition ${
-                isDragging
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/50'
+                isDragging ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
               }`}
             >
               <input
@@ -167,7 +173,7 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
                 onChange={(e) => e.target.files && handleFileChange(e.target.files[0])}
                 className="hidden"
               />
-              
+
               {uploadingReceipt ? (
                 <div className="flex flex-col items-center">
                   <Loader2 className="h-10 w-10 animate-spin text-primary mb-2" />
@@ -181,12 +187,8 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
               ) : (
                 <div className="flex flex-col items-center">
                   <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Drag & drop or click to upload
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    JPEG, PNG, PDF • Max 5MB
-                  </p>
+                  <p className="text-sm text-muted-foreground">Drag & drop or click to upload</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, PDF • Max 5MB</p>
                 </div>
               )}
             </div>

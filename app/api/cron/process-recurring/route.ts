@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabase';
 
 function calculateNextOccurrence(currentDate: Date, frequency: string): Date {
   const next = new Date(currentDate);
-  
+
   switch (frequency) {
     case 'daily':
       next.setDate(next.getDate() + 1);
@@ -27,7 +27,7 @@ function calculateNextOccurrence(currentDate: Date, frequency: string): Date {
       next.setFullYear(next.getFullYear() + 1);
       break;
   }
-  
+
   return next;
 }
 
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
           .from('recurring_expenses')
           .update({ is_active: false })
           .eq('id', recurring.id);
-        
+
         results.details.push({
           id: recurring.id,
           status: 'deactivated',
@@ -77,15 +77,13 @@ export async function GET(request: NextRequest) {
       }
 
       // Create the expense
-      const { error: insertError } = await supabase
-        .from('expenses')
-        .insert({
-          user_id: recurring.user_id,
-          category_id: recurring.category_id,
-          amount: recurring.amount,
-          description: `${recurring.description || ''} (Recurring)`,
-          date: today,
-        });
+      const { error: insertError } = await supabase.from('expenses').insert({
+        user_id: recurring.user_id,
+        category_id: recurring.category_id,
+        amount: recurring.amount,
+        description: `${recurring.description || ''} (Recurring)`,
+        date: today,
+      });
 
       if (insertError) {
         console.error(`Error creating expense for recurring ${recurring.id}:`, insertError);

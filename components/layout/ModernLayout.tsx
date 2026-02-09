@@ -206,7 +206,7 @@ export default function ModernLayout({ children, user }: ModernLayoutProps) {
             >
               <Sparkles className="h-5 w-5" />
             </Button>
-            
+
             <AlertBell />
 
             <Button variant="ghost" size="icon" asChild>

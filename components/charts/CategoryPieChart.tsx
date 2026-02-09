@@ -4,14 +4,22 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const CHART_COLORS = [
-  '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', 
-  '#ef4444', '#14b8a6', '#f97316', '#6366f1', '#8b5cf6'
+  '#8b5cf6',
+  '#ec4899',
+  '#f59e0b',
+  '#10b981',
+  '#3b82f6',
+  '#ef4444',
+  '#14b8a6',
+  '#f97316',
+  '#6366f1',
+  '#8b5cf6',
 ];
 
 export default function CategoryPieChart({ expenses }: any) {
   const categoryTotals = expenses.reduce((acc: any, expense: any) => {
     const categoryName = expense.categories?.name || 'Uncategorized';
-    
+
     if (!acc[categoryName]) {
       acc[categoryName] = { name: categoryName, value: 0 };
     }
@@ -22,7 +30,7 @@ export default function CategoryPieChart({ expenses }: any) {
   const chartData = Object.values(categoryTotals).map((item: any, index: number) => ({
     ...item,
     color: CHART_COLORS[index % CHART_COLORS.length],
-    percentage: 0
+    percentage: 0,
   }));
 
   const total = chartData.reduce((sum: number, item: any) => sum + item.value, 0);
@@ -31,16 +39,14 @@ export default function CategoryPieChart({ expenses }: any) {
   });
 
   const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
       return (
         <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3">
           <p className="font-semibold text-foreground">{payload[0].name}</p>
           <p className="text-sm text-muted-foreground">
             ₹{payload[0].value.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
           </p>
-          <p className="text-xs text-muted-foreground">
-            {payload[0].payload.percentage}% of total
-          </p>
+          <p className="text-xs text-muted-foreground">{payload[0].payload.percentage}% of total</p>
         </div>
       );
     }
@@ -52,13 +58,8 @@ export default function CategoryPieChart({ expenses }: any) {
       <div className="grid grid-cols-2 gap-2 mt-4">
         {payload.map((entry: any, index: number) => (
           <div key={`legend-${index}`} className="flex items-center gap-2">
-            <div 
-              className="w-3 h-3 rounded-full" 
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-xs text-muted-foreground truncate">
-              {entry.value}
-            </span>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+            <span className="text-xs text-muted-foreground truncate">{entry.value}</span>
           </div>
         ))}
       </div>
@@ -83,8 +84,8 @@ export default function CategoryPieChart({ expenses }: any) {
               dataKey="value"
             >
               {chartData.map((entry: any, index: number) => (
-                <Cell 
-                  key={`cell-${index}`} 
+                <Cell
+                  key={`cell-${index}`}
                   fill={entry.color}
                   className="stroke-background hover:opacity-80 transition-opacity"
                   strokeWidth={2}

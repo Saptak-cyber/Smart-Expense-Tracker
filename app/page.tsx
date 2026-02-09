@@ -5,13 +5,11 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-emerald-50">
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-6xl font-bold text-gray-900 mb-6">
-            Smart Expense Tracker
-          </h1>
+          <h1 className="text-6xl font-bold text-gray-900 mb-6">Smart Expense Tracker</h1>
           <p className="text-xl text-gray-600 mb-12">
             AI-powered insights for smarter spending decisions
           </p>
-          
+
           <div className="flex gap-4 justify-center">
             <Link
               href="/login"

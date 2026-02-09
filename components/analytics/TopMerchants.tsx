@@ -16,17 +16,17 @@ export default function TopMerchants({ data }: TopMerchantsProps) {
   return (
     <div className="p-6 bg-card rounded-lg border">
       <h3 className="text-lg font-semibold mb-4">Top Merchants</h3>
-      
+
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} layout="horizontal">
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
+          <XAxis
             type="number"
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickFormatter={(value) => `₹${value}`}
           />
-          <YAxis 
+          <YAxis
             type="category"
             dataKey="merchant"
             stroke="hsl(var(--muted-foreground))"
@@ -41,11 +41,7 @@ export default function TopMerchants({ data }: TopMerchantsProps) {
             }}
             formatter={(value: number) => `₹${value.toFixed(2)}`}
           />
-          <Bar 
-            dataKey="amount" 
-            fill="hsl(var(--primary))"
-            radius={[0, 4, 4, 0]}
-          />
+          <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
 

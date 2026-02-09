@@ -62,22 +62,25 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 #### Manual Deployment
 
 1. **Install Vercel CLI**
+
    ```bash
    npm i -g vercel
    ```
 
 2. **Login to Vercel**
+
    ```bash
    vercel login
    ```
 
 3. **Deploy**
+
    ```bash
    vercel --prod
    ```
 
 4. **Set Environment Variables**
-   
+
    In Vercel Dashboard → Project Settings → Environment Variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -91,6 +94,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Option 2: Docker
 
 1. **Build Docker Image**
+
    ```bash
    docker build -t expense-tracker .
    ```
@@ -107,38 +111,45 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Option 3: VPS (DigitalOcean, AWS, etc.)
 
 1. **SSH into your server**
+
    ```bash
    ssh user@your-server-ip
    ```
 
 2. **Clone repository**
+
    ```bash
    git clone <your-repo-url>
    cd smart-expense-tracker
    ```
 
 3. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 4. **Create environment file**
+
    ```bash
    nano .env.local
    # Add your environment variables
    ```
 
 5. **Build application**
+
    ```bash
    npm run build
    ```
 
 6. **Install PM2**
+
    ```bash
    npm install -g pm2
    ```
 
 7. **Start application**
+
    ```bash
    pm2 start npm --name "expense-tracker" -- start
    pm2 save
@@ -146,11 +157,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
    ```
 
 8. **Setup Nginx as reverse proxy**
+
    ```bash
    sudo nano /etc/nginx/sites-available/expense-tracker
    ```
 
    Add configuration:
+
    ```nginx
    server {
        listen 80;
@@ -168,6 +181,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
    ```
 
    Enable site:
+
    ```bash
    sudo ln -s /etc/nginx/sites-available/expense-tracker /etc/nginx/sites-enabled/
    sudo nginx -t
@@ -207,16 +221,16 @@ Go to Repository → Settings → Secrets and variables → Actions:
 
 ### Required Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | `https://abc.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | `eyJhbGc...` |
-| `GEMINI_API_KEY` | Google Gemini API key | `AIzaSy...` |
+| Variable                        | Description            | Example                   |
+| ------------------------------- | ---------------------- | ------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL   | `https://abc.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | `eyJhbGc...`              |
+| `GEMINI_API_KEY`                | Google Gemini API key  | `AIzaSy...`               |
 
 ### Optional Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
+| Variable              | Description     | Default                 |
+| --------------------- | --------------- | ----------------------- |
 | `NEXT_PUBLIC_APP_URL` | Application URL | `http://localhost:3000` |
 
 ## Post-Deployment Checklist
@@ -284,6 +298,7 @@ pm2 logs expense-tracker
 ### Build Optimization
 
 Already implemented:
+
 - Server Components for reduced JavaScript
 - Code splitting by route
 - Image optimization with Next.js Image
@@ -369,6 +384,7 @@ npm run build
 ## Support
 
 For issues and questions:
+
 - Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 - Review [PRODUCTION_README.md](PRODUCTION_README.md)
 - Open GitHub issue

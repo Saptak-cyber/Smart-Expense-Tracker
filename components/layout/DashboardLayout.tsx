@@ -33,7 +33,7 @@ export default function DashboardLayout({ children, user }: any) {
                 ExpenseTracker
               </Link>
               <div className="hidden md:flex space-x-4">
-                {navItems.map(item => (
+                {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
@@ -49,19 +49,14 @@ export default function DashboardLayout({ children, user }: any) {
                 ))}
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900"
-            >
+            <button onClick={handleLogout} className="px-4 py-2 text-gray-600 hover:text-gray-900">
               Logout
             </button>
           </div>
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-8">
-        {children}
-      </main>
+      <main className="container mx-auto px-4 py-8">{children}</main>
 
       <button
         onClick={() => setShowChatbot(!showChatbot)}
@@ -70,9 +65,7 @@ export default function DashboardLayout({ children, user }: any) {
         🤖
       </button>
 
-      {showChatbot && (
-        <Chatbot user={user} onClose={() => setShowChatbot(false)} />
-      )}
+      {showChatbot && <Chatbot user={user} onClose={() => setShowChatbot(false)} />}
     </div>
   );
 }

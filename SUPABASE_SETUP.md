@@ -11,7 +11,7 @@ The 400 error you're seeing is likely because Supabase requires email confirmati
 
 2. **Navigate to Authentication Settings**
    - Click on "Authentication" in the left sidebar
-   - Click on "Providers" 
+   - Click on "Providers"
    - Find "Email" provider
 
 3. **Disable Email Confirmation**
@@ -49,6 +49,7 @@ Make sure you've run the SQL schema:
 5. Click "Run"
 
 You should see:
+
 - ✓ Tables created (profiles, categories, expenses, budgets, insights_cache, alerts)
 - ✓ RLS policies enabled
 - ✓ Default categories inserted
@@ -68,6 +69,7 @@ You should see 10 default categories (Food & Dining, Transportation, etc.)
 ## Common Issues
 
 ### Issue: "violates foreign key constraint expenses_user_id_fkey"
+
 **Solution**: Your user profile wasn't created. Run this fix:
 
 1. Go to Supabase SQL Editor
@@ -78,6 +80,7 @@ You should see 10 default categories (Food & Dining, Transportation, etc.)
 4. Refresh your app and try again
 
 **Quick Fix SQL**:
+
 ```sql
 -- Create profile for existing users
 INSERT INTO public.profiles (id, email, full_name)
@@ -88,13 +91,17 @@ ON CONFLICT (id) DO NOTHING;
 ```
 
 ### Issue: "Invalid login credentials"
+
 **Solution**: The user doesn't exist yet. Sign up first, then login.
 
 ### Issue: "Email not confirmed"
+
 **Solution**: Disable email confirmation (see steps above) or check your email for confirmation link.
 
 ### Issue: "User already registered"
+
 **Solution**: Use the login page instead of signup.
 
 ### Issue: Tables don't exist
+
 **Solution**: Run the SQL schema from `supabase-schema.sql` in the SQL Editor.

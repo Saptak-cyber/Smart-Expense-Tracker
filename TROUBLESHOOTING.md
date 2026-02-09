@@ -19,7 +19,7 @@ If the automatic fix doesn't work, run this in Supabase SQL Editor:
 
 ```sql
 -- Check which users are missing profiles
-SELECT 
+SELECT
     au.id,
     au.email,
     CASE WHEN p.id IS NULL THEN '❌ Missing' ELSE '✅ Exists' END as profile_status
@@ -28,7 +28,7 @@ LEFT JOIN public.profiles p ON au.id = p.id;
 
 -- Create profiles for users who don't have one
 INSERT INTO public.profiles (id, email, full_name)
-SELECT 
+SELECT
     au.id,
     au.email,
     COALESCE(au.raw_user_meta_data->>'full_name', split_part(au.email, '@', 1))
@@ -53,6 +53,7 @@ The `profiles` table should be automatically populated by a database trigger whe
 ### Prevent Future Issues
 
 Run the complete schema from `supabase-fix-profiles.sql` which includes:
+
 - Improved trigger with error handling
 - Automatic profile creation with fallbacks
 - Conflict resolution (ON CONFLICT DO UPDATE)
@@ -62,6 +63,7 @@ Run the complete schema from `supabase-fix-profiles.sql` which includes:
 **Cause**: The user doesn't exist or password is wrong.
 
 **Solutions**:
+
 1. Make sure you signed up first at `/signup`
 2. Check your email and password
 3. Try resetting your password in Supabase Dashboard
@@ -71,6 +73,7 @@ Run the complete schema from `supabase-fix-profiles.sql` which includes:
 **Cause**: Email confirmation is enabled in Supabase.
 
 **Solution**: Disable email confirmation for development:
+
 1. Go to Supabase Dashboard → Authentication → Providers → Email
 2. Uncheck "Enable email confirmations"
 3. Save
@@ -80,6 +83,7 @@ Run the complete schema from `supabase-fix-profiles.sql` which includes:
 **Cause**: Database schema wasn't run.
 
 **Solution**:
+
 1. Go to Supabase SQL Editor
 2. Paste contents of `supabase-schema.sql`
 3. Click "Run"
@@ -88,21 +92,26 @@ Run the complete schema from `supabase-fix-profiles.sql` which includes:
 ## Testing Your Setup
 
 ### 1. Test Database Connection
+
 Visit: http://localhost:3001/test-connection
 
 Should show:
+
 - ✅ Database connected
 - ✅ Categories found
 - ✅ Auth status
 
 ### 2. Test Profile Creation
+
 Visit: http://localhost:3001/fix-profile
 
 Should show:
+
 - ✅ Authenticated
 - ✅ Profile exists or created
 
 ### 3. Test Full Flow
+
 1. Signup at `/signup`
 2. Should redirect to `/dashboard`
 3. Click "Add Expense"
@@ -112,15 +121,17 @@ Should show:
 ## Still Having Issues?
 
 ### Check Supabase Logs
+
 1. Go to Supabase Dashboard
 2. Click "Logs" → "Postgres Logs"
 3. Look for errors related to triggers or foreign keys
 
 ### Verify RLS Policies
+
 ```sql
 -- Check if RLS is enabled
-SELECT tablename, rowsecurity 
-FROM pg_tables 
+SELECT tablename, rowsecurity
+FROM pg_tables
 WHERE schemaname = 'public';
 
 -- Check policies
@@ -128,6 +139,7 @@ SELECT * FROM pg_policies WHERE schemaname = 'public';
 ```
 
 ### Reset Everything (Nuclear Option)
+
 ```sql
 -- WARNING: This deletes all data!
 DROP TABLE IF EXISTS public.alerts CASCADE;
@@ -143,6 +155,7 @@ DROP TABLE IF EXISTS public.profiles CASCADE;
 ## Getting Help
 
 If you're still stuck:
+
 1. Check the browser console for errors
 2. Check Supabase logs
 3. Verify your `.env.local` has correct values

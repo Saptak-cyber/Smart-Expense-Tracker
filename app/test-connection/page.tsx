@@ -35,7 +35,10 @@ export default function TestConnection() {
       } else if (data && data.length > 0) {
         setStatus((prev: any) => ({ ...prev, categories: `✅ Found ${data.length} categories` }));
       } else {
-        setStatus((prev: any) => ({ ...prev, categories: '⚠️ No categories found - run SQL schema' }));
+        setStatus((prev: any) => ({
+          ...prev,
+          categories: '⚠️ No categories found - run SQL schema',
+        }));
       }
     } catch (err: any) {
       setStatus((prev: any) => ({ ...prev, categories: `❌ Error: ${err.message}` }));
@@ -43,7 +46,9 @@ export default function TestConnection() {
 
     // Test 3: Auth status
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         setStatus((prev: any) => ({ ...prev, auth: `✅ Logged in as ${session.user.email}` }));
       } else {
@@ -58,7 +63,7 @@ export default function TestConnection() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Supabase Connection Test</h1>
-        
+
         <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
           <div className="border-b pb-4">
             <h2 className="font-semibold text-gray-900 mb-2">Database Connection</h2>
@@ -82,7 +87,12 @@ export default function TestConnection() {
             <li>If categories show "No categories found", run the SQL schema in Supabase</li>
             <li>Go to Supabase Dashboard → Authentication → Providers → Email</li>
             <li>Disable "Enable email confirmations" for development</li>
-            <li>Try signing up at <a href="/signup" className="underline">/signup</a></li>
+            <li>
+              Try signing up at{' '}
+              <a href="/signup" className="underline">
+                /signup
+              </a>
+            </li>
           </ol>
         </div>
 

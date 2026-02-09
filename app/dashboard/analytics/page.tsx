@@ -10,7 +10,13 @@ import TopMerchants from '@/components/analytics/TopMerchants';
 import BudgetPerformance from '@/components/analytics/BudgetPerformance';
 import InsightsPanel from '@/components/analytics/InsightsPanel';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Download, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -34,7 +40,9 @@ export default function AnalyticsPage() {
   }, [user, timeRange]);
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       router.push('/login');
       return;
@@ -45,7 +53,9 @@ export default function AnalyticsPage() {
   const loadAnalytics = async () => {
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         router.push('/login');
         return;
@@ -53,11 +63,11 @@ export default function AnalyticsPage() {
 
       const response = await fetch(`/api/analytics/detailed?months=${timeRange}`, {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
       if (!response.ok) throw new Error('Failed to load analytics');
-      
+
       const data = await response.json();
       setAnalyticsData(data);
     } catch (error) {
@@ -71,18 +81,18 @@ export default function AnalyticsPage() {
     if (!analyticsData) return;
 
     const doc = new jsPDF();
-    
+
     // Title
     doc.setFontSize(20);
     doc.text('Expense Analytics Report', 20, 20);
-    
+
     // Summary
     doc.setFontSize(12);
     doc.text(`Total Expenses: ${analyticsData.summary.totalExpenses}`, 20, 40);
     doc.text(`Total Spent: ₹${analyticsData.summary.totalSpent}`, 20, 50);
     doc.text(`Average per Expense: ₹${analyticsData.summary.avgPerExpense}`, 20, 60);
     doc.text(`Average Daily: ₹${analyticsData.summary.avgDaily}`, 20, 70);
-    
+
     // Category Breakdown
     doc.setFontSize(16);
     doc.text('Category Breakdown', 20, 90);
@@ -92,7 +102,7 @@ export default function AnalyticsPage() {
       doc.text(`${cat.name}: ₹${cat.value} (${cat.percentage.toFixed(1)}%)`, 30, y);
       y += 10;
     });
-    
+
     doc.save('expense-analytics.pdf');
     toast.success('PDF exported successfully');
   };
@@ -101,7 +111,7 @@ export default function AnalyticsPage() {
     if (!analyticsData) return;
 
     const wb = XLSX.utils.book_new();
-    
+
     // Summary sheet
     const summaryData = [
       ['Metric', 'Value'],
@@ -112,7 +122,7 @@ export default function AnalyticsPage() {
     ];
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
     XLSX.utils.book_append_sheet(wb, summarySheet, 'Summary');
-    
+
     // Category breakdown sheet
     const categoryData = [
       ['Category', 'Amount', 'Percentage'],
@@ -124,7 +134,7 @@ export default function AnalyticsPage() {
     ];
     const categorySheet = XLSX.utils.aoa_to_sheet(categoryData);
     XLSX.utils.book_append_sheet(wb, categorySheet, 'Categories');
-    
+
     // Monthly trends sheet
     const trendsData = [
       ['Month', 'Spending'],
@@ -132,7 +142,7 @@ export default function AnalyticsPage() {
     ];
     const trendsSheet = XLSX.utils.aoa_to_sheet(trendsData);
     XLSX.utils.book_append_sheet(wb, trendsSheet, 'Monthly Trends');
-    
+
     XLSX.writeFile(wb, 'expense-analytics.xlsx');
     toast.success('Excel exported successfully');
   };

@@ -8,11 +8,15 @@ interface LoadingSpinnerProps {
   fullScreen?: boolean;
 }
 
-export default function LoadingSpinner({ size = 'md', text, fullScreen = false }: LoadingSpinnerProps) {
+export default function LoadingSpinner({
+  size = 'md',
+  text,
+  fullScreen = false,
+}: LoadingSpinnerProps) {
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',
-    lg: 'h-12 w-12'
+    lg: 'h-12 w-12',
   };
 
   const content = (
@@ -24,9 +28,7 @@ export default function LoadingSpinner({ size = 'md', text, fullScreen = false }
 
   if (fullScreen) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        {content}
-      </div>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">{content}</div>
     );
   }
 

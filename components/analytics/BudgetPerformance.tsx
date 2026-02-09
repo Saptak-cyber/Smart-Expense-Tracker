@@ -17,19 +17,27 @@ interface BudgetPerformanceProps {
 export default function BudgetPerformance({ budgets }: BudgetPerformanceProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'good': return 'text-green-500';
-      case 'warning': return 'text-yellow-500';
-      case 'exceeded': return 'text-destructive';
-      default: return 'text-muted-foreground';
+      case 'good':
+        return 'text-green-500';
+      case 'warning':
+        return 'text-yellow-500';
+      case 'exceeded':
+        return 'text-destructive';
+      default:
+        return 'text-muted-foreground';
     }
   };
 
   const getProgressColor = (status: string) => {
     switch (status) {
-      case 'good': return 'bg-green-500';
-      case 'warning': return 'bg-yellow-500';
-      case 'exceeded': return 'bg-destructive';
-      default: return 'bg-primary';
+      case 'good':
+        return 'bg-green-500';
+      case 'warning':
+        return 'bg-yellow-500';
+      case 'exceeded':
+        return 'bg-destructive';
+      default:
+        return 'bg-primary';
     }
   };
 
@@ -40,7 +48,7 @@ export default function BudgetPerformance({ budgets }: BudgetPerformanceProps) {
   return (
     <div className="p-6 bg-card rounded-lg border">
       <h3 className="text-lg font-semibold mb-4">Budget Performance</h3>
-      
+
       {/* Overall Summary */}
       <div className="mb-6 p-4 bg-muted rounded-lg">
         <div className="flex items-center justify-between mb-2">
@@ -52,9 +60,14 @@ export default function BudgetPerformance({ budgets }: BudgetPerformanceProps) {
         <Progress value={overallPercentage} className="h-2" />
         <p className="text-xs text-muted-foreground mt-2">
           {overallPercentage > 100 ? (
-            <span className="text-destructive">Over budget by ₹{(overallSpent - overallLimit).toFixed(2)}</span>
+            <span className="text-destructive">
+              Over budget by ₹{(overallSpent - overallLimit).toFixed(2)}
+            </span>
           ) : (
-            <span>₹{(overallLimit - overallSpent).toFixed(2)} remaining ({(100 - overallPercentage).toFixed(1)}%)</span>
+            <span>
+              ₹{(overallLimit - overallSpent).toFixed(2)} remaining (
+              {(100 - overallPercentage).toFixed(1)}%)
+            </span>
           )}
         </p>
       </div>
@@ -67,7 +80,9 @@ export default function BudgetPerformance({ budgets }: BudgetPerformanceProps) {
               <div className="flex items-center space-x-2">
                 {budget.status === 'good' && <CheckCircle className="h-4 w-4 text-green-500" />}
                 {budget.status === 'warning' && <AlertCircle className="h-4 w-4 text-yellow-500" />}
-                {budget.status === 'exceeded' && <AlertCircle className="h-4 w-4 text-destructive" />}
+                {budget.status === 'exceeded' && (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
                 <span className="text-sm font-medium">{budget.category}</span>
               </div>
               <div className="text-right">
@@ -79,18 +94,13 @@ export default function BudgetPerformance({ budgets }: BudgetPerformanceProps) {
                 </p>
               </div>
             </div>
-            <Progress 
-              value={Math.min(budget.percentage, 100)} 
-              className="h-2"
-            />
+            <Progress value={Math.min(budget.percentage, 100)} className="h-2" />
           </div>
         ))}
       </div>
 
       {budgets.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          No budgets set for this period
-        </div>
+        <div className="text-center py-8 text-muted-foreground">No budgets set for this period</div>
       )}
     </div>
   );

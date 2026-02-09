@@ -25,38 +25,33 @@ export default function BudgetsPage() {
 
   const fetchData = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setUser(user);
 
       const token = session.access_token;
 
       // Fetch all budgets
-      const budgetsResponse = await fetch(
-        `/api/budgets`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const budgetsResponse = await fetch(`/api/budgets`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const budgetsData = await budgetsResponse.json();
       setBudgets(budgetsData);
 
       // Fetch categories
-      const { data: categoriesData } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name');
+      const { data: categoriesData } = await supabase.from('categories').select('*').order('name');
       setCategories(categoriesData || []);
 
       // Fetch all expenses (we'll filter by budget month when calculating spent)
-      const expensesResponse = await fetch(
-        `/api/expenses`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const expensesResponse = await fetch(`/api/expenses`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const expensesData = await expensesResponse.json();
       setExpenses(expensesData.data || []);
     } catch (error) {
@@ -86,7 +81,9 @@ export default function BudgetsPage() {
     if (!confirm('Are you sure you want to delete this budget?')) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       const response = await fetch(`/api/budgets?id=${budgetId}`, {
@@ -123,48 +120,46 @@ export default function BudgetsPage() {
   return (
     <ModernLayout user={user}>
       <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Budgets</h1>
-          <p className="text-muted-foreground">
-            Manage your monthly spending limits
-          </p>
-        </div>
-        <Button onClick={() => setIsModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Budget
-        </Button>
-      </div>
-
-      {budgets.length === 0 ? (
-        <div className="text-center py-12 border border-dashed rounded-lg">
-          <p className="text-muted-foreground mb-4">No budgets created yet</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Budgets</h1>
+            <p className="text-muted-foreground">Manage your monthly spending limits</p>
+          </div>
           <Button onClick={() => setIsModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Create Your First Budget
+            Add Budget
           </Button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {budgets.map((budget) => (
-            <BudgetCard
-              key={budget.id}
-              budget={budget}
-              spent={getSpentAmount(budget.category_id, budget.month, budget.year)}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
-      )}
 
-      <BudgetModal
-        isOpen={isModalOpen}
-        onClose={handleModalClose}
-        onSuccess={fetchData}
-        budget={editingBudget}
-        categories={categories}
-      />
+        {budgets.length === 0 ? (
+          <div className="text-center py-12 border border-dashed rounded-lg">
+            <p className="text-muted-foreground mb-4">No budgets created yet</p>
+            <Button onClick={() => setIsModalOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Your First Budget
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {budgets.map((budget) => (
+              <BudgetCard
+                key={budget.id}
+                budget={budget}
+                spent={getSpentAmount(budget.category_id, budget.month, budget.year)}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
+
+        <BudgetModal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          onSuccess={fetchData}
+          budget={editingBudget}
+          categories={categories}
+        />
       </div>
     </ModernLayout>
   );

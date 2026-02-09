@@ -1,12 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
 import ModernLayout from '@/components/layout/ModernLayout';
 import AddExpenseModal from '@/components/modals/AddExpenseModal';
-import { Plus, Download, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { useExpenses } from '@/lib/hooks/useExpenses';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -16,6 +11,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useExpenses } from '@/lib/hooks/useExpenses';
+import { supabase } from '@/lib/supabase';
+import { Download, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function ExpensesPage() {
@@ -25,14 +25,9 @@ export default function ExpensesPage() {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isError,
-  } = useExpenses({ limit: 50 });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useExpenses({
+    limit: 50,
+  });
 
   useEffect(() => {
     checkUser();
@@ -58,7 +53,9 @@ export default function ExpensesPage() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       router.push('/login');
       return;
@@ -72,14 +69,16 @@ export default function ExpensesPage() {
   };
 
   const handleExport = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     try {
       const response = await fetch('/api/export', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session?.access_token}`,
         },
         body: JSON.stringify({
           user_id: user.id,
@@ -112,10 +111,7 @@ export default function ExpensesPage() {
             <p className="text-muted-foreground">Manage your transactions</p>
           </div>
           <div className="flex space-x-3">
-            <Button
-              onClick={handleExport}
-              variant="outline"
-            >
+            <Button onClick={handleExport} variant="outline">
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
@@ -146,7 +142,7 @@ export default function ExpensesPage() {
                   </TableCell>
                 </TableRow>
               )}
-              
+
               {isError && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-12 text-destructive">
@@ -173,9 +169,7 @@ export default function ExpensesPage() {
 
               {allExpenses.map((expense) => (
                 <TableRow key={expense.id}>
-                  <TableCell>
-                    {new Date(expense.date).toLocaleDateString()}
-                  </TableCell>
+                  <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <span className="text-xl">{expense.categories?.icon}</span>
@@ -186,7 +180,7 @@ export default function ExpensesPage() {
                     {expense.description || '-'}
                   </TableCell>
                   <TableCell className="text-right font-semibold">
-                    ₹{parseFloat(expense.amount).toFixed(2)}
+                    ₹{Number(expense.amount).toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end space-x-2">

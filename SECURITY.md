@@ -17,6 +17,7 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 Instead, please email: **security@yourapp.com**
 
 Include in your report:
+
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact
@@ -125,6 +126,7 @@ None to date (project launched 2026-02-09).
    - Minimize scope of API keys
 
 4. **Keep dependencies updated**
+
    ```bash
    npm audit
    npm update

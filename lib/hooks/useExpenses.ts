@@ -23,7 +23,9 @@ export function useExpenses(options: UseExpensesOptions = {}) {
   return useInfiniteQuery<ExpensesResponse>({
     queryKey: ['expenses', { startDate, endDate, limit }],
     queryFn: async ({ pageParam }) => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Not authenticated');
       }
@@ -35,7 +37,7 @@ export function useExpenses(options: UseExpensesOptions = {}) {
 
       const response = await fetch(`/api/expenses?${params.toString()}`, {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
       if (!response.ok) {
@@ -53,13 +55,15 @@ export function useDeleteExpense() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
       const response = await fetch(`/api/expenses/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
       if (!response.ok) {
@@ -80,14 +84,16 @@ export function useUpdateExpense() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Expense> }) => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
       const response = await fetch(`/api/expenses/${id}`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(data),
       });
@@ -109,14 +115,16 @@ export function useCreateExpense() {
 
   return useMutation({
     mutationFn: async (data: Omit<Expense, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
       const response = await fetch('/api/expenses', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(data),
       });

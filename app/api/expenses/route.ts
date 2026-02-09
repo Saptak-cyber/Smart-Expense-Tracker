@@ -12,19 +12,19 @@ function getSupabaseAuthed(request: NextRequest) {
   const token = request.headers.get('authorization')?.replace('Bearer ', '').trim();
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   });
 }
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const { searchParams } = new URL(request.url);
@@ -67,14 +67,14 @@ export async function POST(request: NextRequest) {
   // Apply rate limiting
   const rateLimitResult = await rateLimit(request, rateLimits.mutation);
   if (rateLimitResult) return rateLimitResult;
-  
+
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const body = await request.json();
-  
+
   // Validate request body
   const validation = await validateRequest(expenseSchema, body);
   if (!validation.success) {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  
+
   const { amount, category_id, description, date } = validation.data;
 
   const { data, error } = await supabase
@@ -119,13 +119,15 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (budget && total > budget.monthly_limit) {
-    await supabase.from('alerts').insert([{
-      user_id: userId,
-      type: 'budget_exceeded',
-      title: 'Budget Exceeded',
-      message: `You've exceeded your budget for this category by ₹${(total - budget.monthly_limit).toFixed(2)}`,
-      severity: 'warning',
-    }]);
+    await supabase.from('alerts').insert([
+      {
+        user_id: userId,
+        type: 'budget_exceeded',
+        title: 'Budget Exceeded',
+        message: `You've exceeded your budget for this category by ₹${(total - budget.monthly_limit).toFixed(2)}`,
+        severity: 'warning',
+      },
+    ]);
   }
 
   return NextResponse.json(data);
@@ -135,14 +137,14 @@ export async function PUT(request: NextRequest) {
   // Apply rate limiting
   const rateLimitResult = await rateLimit(request, rateLimits.mutation);
   if (rateLimitResult) return rateLimitResult;
-  
+
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const body = await request.json();
-  
+
   // Validate request body
   const validation = await validateRequest(updateExpenseSchema, body);
   if (!validation.success) {
@@ -151,20 +153,20 @@ export async function PUT(request: NextRequest) {
       { status: 400 }
     );
   }
-  
+
   const { id, ...updates } = validation.data;
-  
+
   // Verify expense belongs to user before updating
   const { data: existing } = await supabase
     .from('expenses')
     .select('user_id')
     .eq('id', id)
     .single();
-    
+
   if (!existing || existing.user_id !== userId) {
     return NextResponse.json({ error: 'Expense not found' }, { status: 404 });
   }
-  
+
   const { data, error } = await supabase
     .from('expenses')
     .update(updates)
@@ -183,34 +185,31 @@ export async function DELETE(request: NextRequest) {
   // Apply rate limiting
   const rateLimitResult = await rateLimit(request, rateLimits.mutation);
   if (rateLimitResult) return rateLimitResult;
-  
+
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const { searchParams } = new URL(request.url);
   const expenseId = searchParams.get('id');
-  
+
   if (!expenseId) {
     return NextResponse.json({ error: 'Expense ID required' }, { status: 400 });
   }
-  
+
   // Verify expense belongs to user before deleting
   const { data: existing } = await supabase
     .from('expenses')
     .select('user_id')
     .eq('id', expenseId)
     .single();
-    
+
   if (!existing || existing.user_id !== userId) {
     return NextResponse.json({ error: 'Expense not found' }, { status: 404 });
   }
 
-  const { error } = await supabase
-    .from('expenses')
-    .delete()
-    .eq('id', expenseId);
+  const { error } = await supabase.from('expenses').delete().eq('id', expenseId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

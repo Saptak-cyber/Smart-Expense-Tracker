@@ -15,7 +15,7 @@ export function AlertBell() {
 
   useEffect(() => {
     fetchAlerts();
-    
+
     // Subscribe to real-time alerts
     const channel = supabase
       .channel('alerts')
@@ -39,7 +39,9 @@ export function AlertBell() {
 
   const fetchAlerts = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       const response = await fetch('/api/alerts', {
@@ -58,7 +60,9 @@ export function AlertBell() {
 
   const handleMarkAsRead = async (alertId: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       await fetch('/api/alerts', {
@@ -78,7 +82,9 @@ export function AlertBell() {
 
   const handleDelete = async (alertId: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
 
       await fetch(`/api/alerts?id=${alertId}`, {

@@ -11,14 +11,17 @@ interface RateLimitStore {
 const store: RateLimitStore = {};
 
 // Cleanup old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  Object.keys(store).forEach(key => {
-    if (store[key]!.resetAt < now) {
-      delete store[key];
-    }
-  });
-}, 5 * 60 * 1000);
+setInterval(
+  () => {
+    const now = Date.now();
+    Object.keys(store).forEach((key) => {
+      if (store[key]!.resetAt < now) {
+        delete store[key];
+      }
+    });
+  },
+  5 * 60 * 1000
+);
 
 export interface RateLimitConfig {
   interval: number; // milliseconds
@@ -59,7 +62,7 @@ export async function rateLimit(
   // Get identifier (IP address or user ID from auth header)
   const identifier = getIdentifier(request);
   const key = `${identifier}:${request.nextUrl.pathname}`;
-  
+
   const now = Date.now();
   const record = store[key];
 
@@ -80,7 +83,7 @@ export async function rateLimit(
 
   // Rate limit exceeded
   const retryAfter = Math.ceil((record.resetAt - now) / 1000);
-  
+
   return new Response(
     JSON.stringify({
       error: 'Too many requests. Please try again later.',
@@ -106,13 +109,13 @@ function getIdentifier(request: NextRequest): string {
     // Use auth token as identifier (hashed for privacy)
     return hashString(authHeader);
   }
-  
+
   // Fallback to IP address
-  const ip = 
+  const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0] ||
     request.headers.get('x-real-ip') ||
     'unknown';
-  
+
   return ip;
 }
 
@@ -121,7 +124,7 @@ function hashString(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
   return hash.toString(36);

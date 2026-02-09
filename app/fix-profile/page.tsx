@@ -17,9 +17,11 @@ export default function FixProfilePage() {
 
   const checkAndFixProfile = async () => {
     setStatus('Checking authentication...');
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       setStatus('❌ Not logged in. Redirecting to login...');
       setTimeout(() => router.push('/login'), 2000);
@@ -46,12 +48,8 @@ export default function FixProfilePage() {
 
     // Profile doesn't exist, create it
     setStatus('⚠️ Profile missing. Creating profile...');
-    
-    const result = await ensureUserProfile(
-      user.id, 
-      user.email!, 
-      user.user_metadata?.full_name
-    );
+
+    const result = await ensureUserProfile(user.id, user.email!, user.user_metadata?.full_name);
 
     if (result.success) {
       setProfileExists(true);

@@ -1,4 +1,4 @@
-# Accessibility Features Documentation
+s# Accessibility Features Documentation
 
 ## WCAG 2.1 AA Compliance
 
@@ -18,14 +18,14 @@ This application follows WCAG 2.1 Level AA guidelines for web accessibility.
 
 **Keyboard Shortcuts:**
 
-| Shortcut | Action |
-|----------|--------|
-| `Tab` | Move to next focusable element |
-| `Shift + Tab` | Move to previous focusable element |
-| `Enter` | Activate buttons, links, submit forms |
-| `Space` | Toggle checkboxes, activate buttons |
-| `Escape` | Close modals, dropdown menus |
-| `Arrow Keys` | Navigate dropdown options |
+| Shortcut      | Action                                |
+| ------------- | ------------------------------------- |
+| `Tab`         | Move to next focusable element        |
+| `Shift + Tab` | Move to previous focusable element    |
+| `Enter`       | Activate buttons, links, submit forms |
+| `Space`       | Toggle checkboxes, activate buttons   |
+| `Escape`      | Close modals, dropdown menus          |
+| `Arrow Keys`  | Navigate dropdown options             |
 
 #### 2. Screen Reader Support
 
@@ -47,8 +47,10 @@ This application follows WCAG 2.1 Level AA guidelines for web accessibility.
 
 <!-- Landmark regions -->
 <nav aria-label="Main navigation">
-<main>
-<aside aria-label="Filters">
+  <main>
+    <aside aria-label="Filters"></aside>
+  </main>
+</nav>
 ```
 
 **Example Screen Reader Announcements:**
@@ -63,6 +65,7 @@ This application follows WCAG 2.1 Level AA guidelines for web accessibility.
 **Color Contrast:**
 
 All text meets WCAG AA contrast requirements:
+
 - Regular text: 4.5:1 minimum
 - Large text (18pt+): 3:1 minimum
 - Interactive elements: 3:1 minimum
@@ -105,8 +108,8 @@ All text meets WCAG AA contrast requirements:
     id="email"
     type="email"
     aria-required="true"
-    aria-invalid={emailError ? "true" : "false"}
-    aria-describedby={emailError ? "email-error" : undefined}
+    aria-invalid={emailError ? 'true' : 'false'}
+    aria-describedby={emailError ? 'email-error' : undefined}
   />
   {emailError && (
     <p id="email-error" className="text-red-400 text-sm" role="alert">
@@ -128,12 +131,14 @@ All text meets WCAG AA contrast requirements:
 **Loading States:**
 
 ```tsx
-{loading && (
-  <div role="status" aria-live="polite" aria-busy="true">
-    <Loader2 className="animate-spin" />
-    <span className="sr-only">Loading expenses...</span>
-  </div>
-)}
+{
+  loading && (
+    <div role="status" aria-live="polite" aria-busy="true">
+      <Loader2 className="animate-spin" />
+      <span className="sr-only">Loading expenses...</span>
+    </div>
+  );
+}
 ```
 
 **Toast Notifications:**
@@ -317,6 +322,7 @@ npm run lint  # Includes a11y checks
 ## Support
 
 For accessibility issues or suggestions:
+
 - Open a GitHub issue with [a11y] tag
 - Email: accessibility@yourapp.com
 

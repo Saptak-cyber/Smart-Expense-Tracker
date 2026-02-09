@@ -11,18 +11,18 @@ interface EmptyStateProps {
   onAction?: () => void;
 }
 
-export default function EmptyState({ 
-  icon = 'inbox', 
-  title, 
-  description, 
-  actionLabel, 
-  onAction 
+export default function EmptyState({
+  icon = 'inbox',
+  title,
+  description,
+  actionLabel,
+  onAction,
 }: EmptyStateProps) {
   const icons = {
     inbox: Inbox,
     search: Search,
     file: FileQuestion,
-    trend: TrendingUp
+    trend: TrendingUp,
   };
 
   const Icon = icons[icon];
@@ -35,7 +35,7 @@ export default function EmptyState({
       <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
       <p className="text-slate-400 text-center max-w-sm mb-6">{description}</p>
       {actionLabel && onAction && (
-        <Button 
+        <Button
           onClick={onAction}
           className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
         >

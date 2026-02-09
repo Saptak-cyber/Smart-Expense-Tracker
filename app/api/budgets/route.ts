@@ -12,19 +12,19 @@ function getSupabaseAuthed(request: NextRequest) {
   const token = request.headers.get('authorization')?.replace('Bearer ', '').trim();
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   });
 }
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const { searchParams } = new URL(request.url);
@@ -52,14 +52,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const rateLimitResult = await rateLimit(request, rateLimits.mutation);
   if (rateLimitResult) return rateLimitResult;
-  
+
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const body = await request.json();
-  
+
   // Validate request body
   const validation = validateRequest(budgetSchema, body);
   if (!validation.success) {
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-  
+
   const { category_id, monthly_limit, month, year } = validation.data;
 
   const { data, error } = await supabase
@@ -94,14 +94,14 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const rateLimitResult = await rateLimit(request, rateLimits.mutation);
   if (rateLimitResult) return rateLimitResult;
-  
+
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const body = await request.json();
-  
+
   // Validate request body
   const validation = validateRequest(updateBudgetSchema, body);
   if (!validation.success) {
@@ -110,20 +110,16 @@ export async function PUT(request: NextRequest) {
       { status: 400 }
     );
   }
-  
+
   const { id, ...updates } = validation.data;
-  
+
   // Verify budget belongs to user
-  const { data: existing } = await supabase
-    .from('budgets')
-    .select('user_id')
-    .eq('id', id)
-    .single();
-    
+  const { data: existing } = await supabase.from('budgets').select('user_id').eq('id', id).single();
+
   if (!existing || existing.user_id !== userId) {
     return NextResponse.json({ error: 'Budget not found' }, { status: 404 });
   }
-  
+
   const { data, error } = await supabase
     .from('budgets')
     .update(updates)
@@ -141,34 +137,31 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const rateLimitResult = await rateLimit(request, rateLimits.mutation);
   if (rateLimitResult) return rateLimitResult;
-  
+
   const auth = await requireAuth(request);
   if (auth.error) return auth.response;
-  
+
   const userId = auth.user!.id;
   const supabase = getSupabaseAuthed(request);
   const { searchParams } = new URL(request.url);
   const budgetId = searchParams.get('id');
-  
+
   if (!budgetId) {
     return NextResponse.json({ error: 'Budget ID required' }, { status: 400 });
   }
-  
+
   // Verify budget belongs to user
   const { data: existing } = await supabase
     .from('budgets')
     .select('user_id')
     .eq('id', budgetId)
     .single();
-    
+
   if (!existing || existing.user_id !== userId) {
     return NextResponse.json({ error: 'Budget not found' }, { status: 404 });
   }
 
-  const { error } = await supabase
-    .from('budgets')
-    .delete()
-    .eq('id', budgetId);
+  const { error } = await supabase.from('budgets').delete().eq('id', budgetId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
