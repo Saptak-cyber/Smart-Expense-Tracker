@@ -1,0 +1,9 @@
+-- Add receipt_url column to expenses table
+ALTER TABLE expenses
+ADD COLUMN receipt_url TEXT;
+
+-- Create storage bucket for receipts (run this in Supabase dashboard or via API)
+-- Name: receipts
+-- Public: false
+-- File size limit: 5MB
+-- Allowed file types: image/jpeg, image/png, image/jpg, application/pdf

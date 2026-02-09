@@ -1,0 +1,49 @@
+-- Create recurring_expenses table
+CREATE TABLE IF NOT EXISTS recurring_expenses (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+  amount DECIMAL(10, 2) NOT NULL,
+  description TEXT,
+  frequency VARCHAR(20) NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'yearly')),
+  start_date DATE NOT NULL,
+  end_date DATE,
+  next_occurrence DATE NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Add RLS policies
+ALTER TABLE recurring_expenses ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see their own recurring expenses
+CREATE POLICY "Users can view own recurring expenses"
+  ON recurring_expenses FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Users can create their own recurring expenses
+CREATE POLICY "Users can create own recurring expenses"
+  ON recurring_expenses FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- Users can update their own recurring expenses
+CREATE POLICY "Users can update own recurring expenses"
+  ON recurring_expenses FOR UPDATE
+  USING (auth.uid() = user_id);
+
+-- Users can delete their own recurring expenses
+CREATE POLICY "Users can delete own recurring expenses"
+  ON recurring_expenses FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- Create index for faster queries
+CREATE INDEX idx_recurring_expenses_user_id ON recurring_expenses(user_id);
+CREATE INDEX idx_recurring_expenses_next_occurrence ON recurring_expenses(next_occurrence);
+CREATE INDEX idx_recurring_expenses_is_active ON recurring_expenses(is_active);
+
+-- Add trigger for updated_at
+CREATE TRIGGER update_recurring_expenses_updated_at
+  BEFORE UPDATE ON recurring_expenses
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
