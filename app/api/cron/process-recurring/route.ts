@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 
 // This endpoint will be called by Vercel Cron
 // Add this to vercel.json:

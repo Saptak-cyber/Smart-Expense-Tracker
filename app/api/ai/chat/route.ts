@@ -1,9 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
-import { generateInsight, buildFinancialPrompt } from '@/lib/gemini';
 import { requireAuth } from '@/lib/auth-utils';
-import { aiChatSchema, validateRequest } from '@/lib/validations';
+import { buildFinancialPrompt, generateInsight } from '@/lib/gemini';
 import { rateLimit, rateLimits } from '@/lib/rate-limit';
+import { supabase } from '@/lib/supabase';
+import { aiChatSchema, validateRequest } from '@/lib/validations';
+import { NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   // Apply rate limiting

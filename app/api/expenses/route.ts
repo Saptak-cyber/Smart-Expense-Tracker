@@ -1,12 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '@/lib/auth-utils';
-import { expenseSchema, updateExpenseSchema, validateRequest } from '@/lib/validations';
-import { rateLimit, rateLimits } from '@/lib/rate-limit';
 import { getEnv } from '@/lib/env';
+import { rateLimit, rateLimits } from '@/lib/rate-limit';
+import { expenseSchema, updateExpenseSchema, validateRequest } from '@/lib/validations';
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
 
 const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
 const supabaseAnonKey = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+
+export const dynamic = 'force-dynamic';
 
 function getSupabaseAuthed(request: NextRequest) {
   const token = request.headers.get('authorization')?.replace('Bearer ', '').trim();

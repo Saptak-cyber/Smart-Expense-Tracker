@@ -1,9 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-utils';
-import { createClient } from '@supabase/supabase-js';
-import { createWorker } from 'tesseract.js';
-import { checkRateLimit } from '@/lib/rate-limit';
 import { getEnv } from '@/lib/env';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from 'next/server';
+import { createWorker } from 'tesseract.js';
+
+export const dynamic = 'force-dynamic';
 
 const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
 const supabaseServiceKey =
