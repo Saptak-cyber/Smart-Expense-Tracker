@@ -1,5 +1,6 @@
 import { requireAuth } from '@/lib/auth-utils';
 import { getEnv } from '@/lib/env';
+import { generateAnalyticsInsights } from '@/lib/gemini';
 import { createClient } from '@supabase/supabase-js';
 import { endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
 import { NextRequest, NextResponse } from 'next/server';
@@ -163,8 +164,9 @@ export async function GET(request: NextRequest) {
     // Generate AI insights
     const insights = [];
 
-    // Average daily spending
-    const avgDaily = totalSpent / 30;
+    // Average daily spending - calculate based on actual time range
+    const daysInRange = months * 30; // Approximate days in the selected period
+    const avgDaily = totalSpent / daysInRange;
     insights.push({
       type: 'info',
       title: 'Daily Average',
@@ -191,18 +193,150 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Positive trend
+    // Budget approaching limit
+    const warningBudgets = budgetPerformance.filter((b) => b.status === 'warning');
+    if (warningBudgets.length > 0) {
+      insights.push({
+        type: 'warning',
+        title: 'Budget Warning',
+        description: `${warningBudgets.length} budget(s) are at 80% or more of their limit`,
+      });
+    }
+
+    // Positive trend - spending reduced
     if (monthlyTrends.length >= 2) {
       const lastMonth = monthlyTrends[monthlyTrends.length - 1].total;
       const prevMonth = monthlyTrends[monthlyTrends.length - 2].total;
       if (lastMonth < prevMonth) {
         const savings = prevMonth - lastMonth;
+        const percentageDecrease = ((savings / prevMonth) * 100).toFixed(1);
         insights.push({
           type: 'positive',
           title: 'Spending Reduced',
-          description: `You saved ₹${savings.toFixed(2)} compared to last month!`,
+          description: `You saved ₹${savings.toFixed(2)} (${percentageDecrease}%) compared to last month!`,
+        });
+      } else if (lastMonth > prevMonth) {
+        const increase = lastMonth - prevMonth;
+        const percentageIncrease = ((increase / prevMonth) * 100).toFixed(1);
+        insights.push({
+          type: 'negative',
+          title: 'Spending Increased',
+          description: `Your spending increased by ₹${increase.toFixed(2)} (${percentageIncrease}%) compared to last month`,
         });
       }
+    }
+
+    // Spending consistency analysis
+    if (monthlyTrends.length >= 3) {
+      const amounts = monthlyTrends.map((m) => m.total);
+      const avg = amounts.reduce((sum, val) => sum + val, 0) / amounts.length;
+      const variance = amounts.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / amounts.length;
+      const stdDev = Math.sqrt(variance);
+      const coefficientOfVariation = (stdDev / avg) * 100;
+
+      if (coefficientOfVariation < 15) {
+        insights.push({
+          type: 'positive',
+          title: 'Consistent Spending',
+          description: `Your spending pattern is very consistent, making it easier to budget`,
+        });
+      } else if (coefficientOfVariation > 40) {
+        insights.push({
+          type: 'warning',
+          title: 'Irregular Spending',
+          description: `Your spending varies significantly month-to-month. Consider reviewing your expenses`,
+        });
+      }
+    }
+
+    // High-value transaction detection
+    if (expenses && expenses.length > 0) {
+      const avgExpense = totalSpent / expenses.length;
+      const highValueExpenses = expenses.filter((e) => parseFloat(e.amount) > avgExpense * 3);
+      
+      if (highValueExpenses.length > 0) {
+        const highValueTotal = highValueExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+        const highValuePercentage = ((highValueTotal / totalSpent) * 100).toFixed(0);
+        insights.push({
+          type: 'info',
+          title: 'Large Transactions',
+          description: `${highValueExpenses.length} large transaction(s) account for ${highValuePercentage}% of your spending`,
+        });
+      }
+    }
+
+    // Category diversification
+    if (categoryBreakdown.length > 0) {
+      const topThreePercentage = categoryBreakdown
+        .slice(0, 3)
+        .reduce((sum, cat) => sum + cat.percentage, 0);
+      
+      if (topThreePercentage > 80) {
+        insights.push({
+          type: 'info',
+          title: 'Concentrated Spending',
+          description: `${topThreePercentage.toFixed(0)}% of your spending is in just 3 categories`,
+        });
+      } else if (categoryBreakdown.length >= 5) {
+        insights.push({
+          type: 'positive',
+          title: 'Diversified Spending',
+          description: `Your expenses are well-distributed across ${categoryBreakdown.length} categories`,
+        });
+      }
+    }
+
+    // Weekend vs weekday spending (if we have date data)
+    if (expenses && expenses.length > 5) {
+      const weekendExpenses = expenses.filter((e) => {
+        const day = new Date(e.date).getDay();
+        return day === 0 || day === 6; // Sunday or Saturday
+      });
+      const weekdayExpenses = expenses.filter((e) => {
+        const day = new Date(e.date).getDay();
+        return day !== 0 && day !== 6;
+      });
+
+      if (weekendExpenses.length > 0 && weekdayExpenses.length > 0) {
+        const weekendTotal = weekendExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+        const weekdayTotal = weekdayExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+        const weekendAvg = weekendTotal / weekendExpenses.length;
+        const weekdayAvg = weekdayTotal / weekdayExpenses.length;
+
+        if (weekendAvg > weekdayAvg * 1.3) {
+          const difference = ((weekendAvg / weekdayAvg - 1) * 100).toFixed(0);
+          insights.push({
+            type: 'info',
+            title: 'Weekend Spending Pattern',
+            description: `You spend ${difference}% more per transaction on weekends`,
+          });
+        }
+      }
+    }
+
+    // Generate AI-powered insights using Gemini
+    let aiInsights: string[] = [];
+    try {
+      if (process.env.GEMINI_API_KEY && expenses && expenses.length > 0) {
+        aiInsights = await generateAnalyticsInsights(
+          expenses,
+          categoryBreakdown,
+          monthlyTrends,
+          budgets || []
+        );
+        
+        // Add AI insights to the insights array
+        aiInsights.forEach((insight) => {
+          insights.push({
+            type: 'info',
+            title: '🤖 AI Insight',
+            description: insight,
+          });
+        });
+      }
+    } catch (error) {
+      console.error('Failed to generate AI insights:', error);
+      // Continue without AI insights if generation fails
     }
 
     return NextResponse.json({

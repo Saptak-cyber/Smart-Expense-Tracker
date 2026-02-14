@@ -1,32 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
-import ModernLayout from '@/components/layout/ModernLayout';
-import SpendingTrends from '@/components/analytics/SpendingTrends';
-import CategoryBreakdown from '@/components/analytics/CategoryBreakdown';
-import TopMerchants from '@/components/analytics/TopMerchants';
 import BudgetPerformance from '@/components/analytics/BudgetPerformance';
+import CategoryBreakdown from '@/components/analytics/CategoryBreakdown';
 import InsightsPanel from '@/components/analytics/InsightsPanel';
+import SpendingTrends from '@/components/analytics/SpendingTrends';
+import TopMerchants from '@/components/analytics/TopMerchants';
+import ModernLayout from '@/components/layout/ModernLayout';
 import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
-import { Download, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 import jsPDF from 'jspdf';
+import { FileSpreadsheet, FileText, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
 export default function AnalyticsPage() {
   const [user, setUser] = useState<any>(null);
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('6');
+  const [timeRange, setTimeRange] = useState('1');
   const router = useRouter();
 
   useEffect(() => {
@@ -161,6 +161,7 @@ export default function AnalyticsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="1">Last 1 month</SelectItem>
                 <SelectItem value="3">Last 3 months</SelectItem>
                 <SelectItem value="6">Last 6 months</SelectItem>
                 <SelectItem value="12">Last 12 months</SelectItem>

@@ -116,6 +116,42 @@ export async function generateInsight(prompt: string): Promise<string> {
   return response.text();
 }
 
+export async function generateAnalyticsInsights(
+  expenses: any[],
+  categoryBreakdown: any[],
+  monthlyTrends: any[],
+  budgets: any[]
+): Promise<string[]> {
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
+
+  const totalSpent = expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+  const avgExpense = expenses.length > 0 ? totalSpent / expenses.length : 0;
+
+  const prompt = `You are a financial advisor analyzing spending patterns. Based on the data below, provide 2-3 concise, actionable insights (each 1-2 sentences max).
+
+Financial Data:
+- Total Expenses: ${expenses.length} transactions
+- Total Spent: ₹${totalSpent.toFixed(2)}
+- Average Transaction: ₹${avgExpense.toFixed(2)}
+- Top Categories: ${categoryBreakdown.slice(0, 3).map(c => `${c.name} (₹${c.value})`).join(', ')}
+- Monthly Trend: ${monthlyTrends.slice(-3).map(m => `${m.month}: ₹${m.total}`).join(', ')}
+- Budgets: ${budgets.length} active budgets
+
+Instructions:
+- Focus on actionable advice, not just observations
+- Be specific with numbers when relevant
+- Keep each insight under 25 words
+- Return ONLY the insights, one per line, no numbering or bullets
+- Do not use phrases like "Based on the data" or "Consider"
+- Be direct and conversational`;
+
+  const result = await model.generateContent(prompt);
+  const response = result.response.text();
+  
+  // Split by newlines and filter empty lines
+  return response.split('\n').filter(line => line.trim().length > 0).slice(0, 3);
+}
+
 export function buildFinancialPrompt(
   expenses: any[],
   categoryBreakdown: any[],
