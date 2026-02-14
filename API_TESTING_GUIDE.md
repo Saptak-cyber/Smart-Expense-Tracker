@@ -3,6 +3,7 @@
 Complete guide for testing all backend endpoints in your expense tracker application.
 
 ## Table of Contents
+
 1. [Authentication Setup](#authentication-setup)
 2. [Health Check](#health-check)
 3. [Expenses API](#expenses-api)
@@ -49,11 +50,13 @@ All endpoints (except health check and categories GET) require authentication. Y
 Check if the API is running.
 
 **cURL:**
+
 ```bash
 curl -X GET http://localhost:3000/api/health
 ```
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -71,24 +74,28 @@ curl -X GET http://localhost:3000/api/health
 Fetch all expenses for the authenticated user with optional filters.
 
 **Query Parameters:**
+
 - `start_date` (optional): Filter by start date (YYYY-MM-DD)
 - `end_date` (optional): Filter by end date (YYYY-MM-DD)
 - `cursor` (optional): Pagination cursor
 - `limit` (optional): Number of results (default: 50)
 
 **cURL:**
+
 ```bash
 curl -X GET "http://localhost:3000/api/expenses?start_date=2026-01-01&end_date=2026-02-14&limit=20" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Postman:**
+
 - Method: `GET`
 - URL: `{{base_url}}/api/expenses`
 - Headers: `Authorization: Bearer {{auth_token}}`
 - Params: `start_date=2026-01-01`, `end_date=2026-02-14`, `limit=20`
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -120,9 +127,10 @@ curl -X GET "http://localhost:3000/api/expenses?start_date=2026-01-01&end_date=2
 Create a new expense.
 
 **Request Body:**
+
 ```json
 {
-  "amount": 150.50,
+  "amount": 150.5,
   "category_id": "uuid-of-category",
   "description": "Grocery shopping at Walmart",
   "date": "2026-02-14"
@@ -130,6 +138,7 @@ Create a new expense.
 ```
 
 **cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/api/expenses \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -143,15 +152,17 @@ curl -X POST http://localhost:3000/api/expenses \
 ```
 
 **Postman:**
+
 - Method: `POST`
 - URL: `{{base_url}}/api/expenses`
-- Headers: 
+- Headers:
   - `Authorization: Bearer {{auth_token}}`
   - `Content-Type: application/json`
 - Body (raw JSON):
+
 ```json
 {
-  "amount": 150.50,
+  "amount": 150.5,
   "category_id": "your-category-uuid",
   "description": "Grocery shopping",
   "date": "2026-02-14"
@@ -159,6 +170,7 @@ curl -X POST http://localhost:3000/api/expenses \
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -176,16 +188,18 @@ curl -X POST http://localhost:3000/api/expenses \
 Update an existing expense.
 
 **Request Body:**
+
 ```json
 {
   "id": "expense-uuid",
-  "amount": 175.00,
+  "amount": 175.0,
   "description": "Updated description",
   "date": "2026-02-14"
 }
 ```
 
 **cURL:**
+
 ```bash
 curl -X PUT http://localhost:3000/api/expenses \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -204,20 +218,24 @@ curl -X PUT http://localhost:3000/api/expenses \
 Delete an expense.
 
 **Query Parameters:**
+
 - `id` (required): Expense ID to delete
 
 **cURL:**
+
 ```bash
 curl -X DELETE "http://localhost:3000/api/expenses?id=expense-uuid" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Postman:**
+
 - Method: `DELETE`
 - URL: `{{base_url}}/api/expenses?id=expense-uuid`
 - Headers: `Authorization: Bearer {{auth_token}}`
 
 **Response:**
+
 ```json
 {
   "success": true
@@ -233,16 +251,19 @@ curl -X DELETE "http://localhost:3000/api/expenses?id=expense-uuid" \
 Fetch all budgets for the authenticated user.
 
 **Query Parameters:**
+
 - `month` (optional): Filter by month (1-12)
 - `year` (optional): Filter by year (YYYY)
 
 **cURL:**
+
 ```bash
 curl -X GET "http://localhost:3000/api/budgets?month=2&year=2026" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -267,6 +288,7 @@ curl -X GET "http://localhost:3000/api/budgets?month=2&year=2026" \
 Create a new budget.
 
 **Request Body:**
+
 ```json
 {
   "category_id": "uuid",
@@ -277,6 +299,7 @@ Create a new budget.
 ```
 
 **cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/api/budgets \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -292,6 +315,7 @@ curl -X POST http://localhost:3000/api/budgets \
 **Response:** Created budget object with category details.
 
 **Error Response (Duplicate):**
+
 ```json
 {
   "error": "Budget for this category and month already exists"
@@ -303,6 +327,7 @@ curl -X POST http://localhost:3000/api/budgets \
 Update an existing budget.
 
 **Request Body:**
+
 ```json
 {
   "id": "budget-uuid",
@@ -311,6 +336,7 @@ Update an existing budget.
 ```
 
 **cURL:**
+
 ```bash
 curl -X PUT http://localhost:3000/api/budgets \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -326,12 +352,14 @@ curl -X PUT http://localhost:3000/api/budgets \
 Delete a budget.
 
 **cURL:**
+
 ```bash
 curl -X DELETE "http://localhost:3000/api/budgets?id=budget-uuid" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 {
   "success": true
@@ -347,11 +375,13 @@ curl -X DELETE "http://localhost:3000/api/budgets?id=budget-uuid" \
 Fetch all categories (public endpoint, no auth required).
 
 **cURL:**
+
 ```bash
 curl -X GET http://localhost:3000/api/categories
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -374,6 +404,7 @@ curl -X GET http://localhost:3000/api/categories
 Create a new category (requires authentication and service role).
 
 **Request Body:**
+
 ```json
 {
   "name": "Entertainment",
@@ -382,6 +413,7 @@ Create a new category (requires authentication and service role).
 ```
 
 **cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/api/categories \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -401,15 +433,18 @@ curl -X POST http://localhost:3000/api/categories \
 Fetch analytics data by type.
 
 **Query Parameters:**
+
 - `type` (required): `monthly` or `categories`
 
 **cURL (Monthly Summary):**
+
 ```bash
 curl -X GET "http://localhost:3000/api/analytics?type=monthly" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response (Monthly):**
+
 ```json
 [
   {
@@ -421,12 +456,14 @@ curl -X GET "http://localhost:3000/api/analytics?type=monthly" \
 ```
 
 **cURL (Category Breakdown):**
+
 ```bash
 curl -X GET "http://localhost:3000/api/analytics?type=categories" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response (Categories):**
+
 ```json
 [
   {
@@ -442,34 +479,37 @@ curl -X GET "http://localhost:3000/api/analytics?type=categories" \
 Fetch detailed analytics with insights.
 
 **Query Parameters:**
+
 - `months` (optional): Number of months to analyze (default: 6)
 
 **cURL:**
+
 ```bash
 curl -X GET "http://localhost:3000/api/analytics/detailed?months=6" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 {
   "monthlyTrends": [
     {
       "month": "Jan 2026",
-      "total": 12500.50
+      "total": 12500.5
     }
   ],
   "categoryBreakdown": [
     {
       "name": "Food",
-      "value": 8000.00,
+      "value": 8000.0,
       "percentage": 45.5
     }
   ],
   "topMerchants": [
     {
       "merchant": "Walmart",
-      "amount": 3500.00,
+      "amount": 3500.0,
       "count": 12,
       "trend": "neutral"
     }
@@ -477,9 +517,9 @@ curl -X GET "http://localhost:3000/api/analytics/detailed?months=6" \
   "budgetPerformance": [
     {
       "category": "Food",
-      "limit": 5000.00,
-      "spent": 4500.00,
-      "remaining": 500.00,
+      "limit": 5000.0,
+      "spent": 4500.0,
+      "remaining": 500.0,
       "percentage": 90.0,
       "status": "warning"
     }
@@ -493,7 +533,7 @@ curl -X GET "http://localhost:3000/api/analytics/detailed?months=6" \
   ],
   "summary": {
     "totalExpenses": 150,
-    "totalSpent": 12500.50,
+    "totalSpent": 12500.5,
     "avgPerExpense": 83.34,
     "avgDaily": 416.68
   }
@@ -509,15 +549,18 @@ curl -X GET "http://localhost:3000/api/analytics/detailed?months=6" \
 Fetch alerts for the authenticated user.
 
 **Query Parameters:**
+
 - `unread_only` (optional): `true` to fetch only unread alerts
 
 **cURL:**
+
 ```bash
 curl -X GET "http://localhost:3000/api/alerts?unread_only=true" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -538,6 +581,7 @@ curl -X GET "http://localhost:3000/api/alerts?unread_only=true" \
 Mark an alert as read/unread.
 
 **Request Body:**
+
 ```json
 {
   "alert_id": "uuid",
@@ -546,6 +590,7 @@ Mark an alert as read/unread.
 ```
 
 **cURL:**
+
 ```bash
 curl -X PATCH http://localhost:3000/api/alerts \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -561,6 +606,7 @@ curl -X PATCH http://localhost:3000/api/alerts \
 Delete an alert.
 
 **cURL:**
+
 ```bash
 curl -X DELETE "http://localhost:3000/api/alerts?id=alert-uuid" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
@@ -575,12 +621,14 @@ curl -X DELETE "http://localhost:3000/api/alerts?id=alert-uuid" \
 Fetch user profile.
 
 **cURL:**
+
 ```bash
 curl -X GET http://localhost:3000/api/profile \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -600,6 +648,7 @@ curl -X GET http://localhost:3000/api/profile \
 Update user profile settings.
 
 **Request Body:**
+
 ```json
 {
   "full_name": "John Smith",
@@ -612,6 +661,7 @@ Update user profile settings.
 ```
 
 **cURL:**
+
 ```bash
 curl -X PATCH http://localhost:3000/api/profile \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -631,12 +681,14 @@ curl -X PATCH http://localhost:3000/api/profile \
 Fetch all recurring expenses.
 
 **cURL:**
+
 ```bash
 curl -X GET http://localhost:3000/api/recurring-expenses \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -664,6 +716,7 @@ curl -X GET http://localhost:3000/api/recurring-expenses \
 Create a new recurring expense.
 
 **Request Body:**
+
 ```json
 {
   "category_id": "uuid",
@@ -678,6 +731,7 @@ Create a new recurring expense.
 **Frequency Options:** `daily`, `weekly`, `monthly`, `yearly`
 
 **cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/api/recurring-expenses \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -696,6 +750,7 @@ curl -X POST http://localhost:3000/api/recurring-expenses \
 Update a recurring expense.
 
 **Request Body:**
+
 ```json
 {
   "id": "recurring-expense-uuid",
@@ -705,6 +760,7 @@ Update a recurring expense.
 ```
 
 **cURL:**
+
 ```bash
 curl -X PUT http://localhost:3000/api/recurring-expenses \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -720,6 +776,7 @@ curl -X PUT http://localhost:3000/api/recurring-expenses \
 Delete a recurring expense.
 
 **cURL:**
+
 ```bash
 curl -X DELETE "http://localhost:3000/api/recurring-expenses?id=recurring-expense-uuid" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
@@ -734,6 +791,7 @@ curl -X DELETE "http://localhost:3000/api/recurring-expenses?id=recurring-expens
 Export expenses to CSV format.
 
 **Request Body:**
+
 ```json
 {
   "format": "csv",
@@ -744,6 +802,7 @@ Export expenses to CSV format.
 ```
 
 **cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/api/export \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -757,12 +816,14 @@ curl -X POST http://localhost:3000/api/export \
 ```
 
 **Postman:**
+
 - Method: `POST`
 - URL: `{{base_url}}/api/export`
-- Headers: 
+- Headers:
   - `Authorization: Bearer {{auth_token}}`
   - `Content-Type: application/json`
 - Body (raw JSON):
+
 ```json
 {
   "format": "csv",
@@ -770,6 +831,7 @@ curl -X POST http://localhost:3000/api/export \
   "end_date": "2026-02-14"
 }
 ```
+
 - Click "Send and Download" to save the CSV file
 
 **Response:** CSV file download
@@ -783,6 +845,7 @@ curl -X POST http://localhost:3000/api/export \
 Chat with AI assistant about your finances.
 
 **Request Body:**
+
 ```json
 {
   "query": "How can I reduce my food expenses?",
@@ -792,6 +855,7 @@ Chat with AI assistant about your finances.
 ```
 
 **cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/api/ai/chat \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -804,6 +868,7 @@ curl -X POST http://localhost:3000/api/ai/chat \
 ```
 
 **Response:**
+
 ```json
 {
   "response": "Based on your spending patterns, here are some suggestions to reduce food expenses: 1. You're spending an average of ₹8000/month on food. Consider meal planning to reduce impulse purchases. 2. Your top merchant is Walmart with 12 transactions. Try buying in bulk to save money..."
@@ -821,15 +886,18 @@ curl -X POST http://localhost:3000/api/ai/chat \
 Fetch chat history with AI assistant.
 
 **Query Parameters:**
+
 - `limit` (optional): Number of messages (default: 50)
 
 **cURL:**
+
 ```bash
 curl -X GET "http://localhost:3000/api/chat-history?limit=20" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -856,6 +924,7 @@ curl -X GET "http://localhost:3000/api/chat-history?limit=20" \
 Add a message to chat history.
 
 **Request Body:**
+
 ```json
 {
   "role": "user",
@@ -865,6 +934,7 @@ Add a message to chat history.
 ```
 
 **cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/api/chat-history \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -880,12 +950,14 @@ curl -X POST http://localhost:3000/api/chat-history \
 Clear all chat history.
 
 **cURL:**
+
 ```bash
 curl -X DELETE http://localhost:3000/api/chat-history \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Chat history cleared"
@@ -903,6 +975,7 @@ Upload a receipt image with OCR processing.
 **Request:** Multipart form data with file
 
 **cURL:**
+
 ```bash
 curl -X POST http://localhost:3000/api/receipts/upload \
   -H "Authorization: Bearer YOUR_TOKEN_HERE" \
@@ -910,10 +983,11 @@ curl -X POST http://localhost:3000/api/receipts/upload \
 ```
 
 **Postman:**
+
 - Method: `POST`
 - URL: `{{base_url}}/api/receipts/upload`
 - Headers: `Authorization: Bearer {{auth_token}}`
-- Body: 
+- Body:
   - Select "form-data"
   - Key: `file` (change type to "File")
   - Value: Select your receipt image
@@ -921,12 +995,13 @@ curl -X POST http://localhost:3000/api/receipts/upload \
 **Supported Formats:** JPEG, PNG, PDF (max 5MB)
 
 **Response:**
+
 ```json
 {
   "url": "https://your-supabase-url/storage/v1/object/public/receipts/user-id/timestamp_receipt.jpg",
   "fileName": "user-id/timestamp_receipt.jpg",
   "ocr": {
-    "amount": 150.50,
+    "amount": 150.5,
     "date": "2026-02-14",
     "merchant": "Walmart Supercenter"
   }
@@ -938,15 +1013,18 @@ curl -X POST http://localhost:3000/api/receipts/upload \
 Delete a receipt.
 
 **Query Parameters:**
+
 - `fileName` (required): File name from upload response
 
 **cURL:**
+
 ```bash
 curl -X DELETE "http://localhost:3000/api/receipts/upload?fileName=user-id/timestamp_receipt.jpg" \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Receipt deleted successfully"
@@ -964,12 +1042,14 @@ Process recurring expenses (automated cron job).
 **Authorization:** Requires `CRON_SECRET` in Authorization header
 
 **cURL:**
+
 ```bash
 curl -X GET http://localhost:3000/api/cron/process-recurring \
   -H "Authorization: Bearer YOUR_CRON_SECRET"
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -993,6 +1073,7 @@ curl -X GET http://localhost:3000/api/cron/process-recurring \
 ## Common Error Responses
 
 ### 400 Bad Request
+
 ```json
 {
   "error": "Validation error message",
@@ -1006,6 +1087,7 @@ curl -X GET http://localhost:3000/api/cron/process-recurring \
 ```
 
 ### 401 Unauthorized
+
 ```json
 {
   "error": "Unauthorized"
@@ -1013,6 +1095,7 @@ curl -X GET http://localhost:3000/api/cron/process-recurring \
 ```
 
 ### 404 Not Found
+
 ```json
 {
   "error": "Resource not found"
@@ -1020,6 +1103,7 @@ curl -X GET http://localhost:3000/api/cron/process-recurring \
 ```
 
 ### 429 Too Many Requests
+
 ```json
 {
   "error": "Rate limit exceeded"
@@ -1027,6 +1111,7 @@ curl -X GET http://localhost:3000/api/cron/process-recurring \
 ```
 
 ### 500 Internal Server Error
+
 ```json
 {
   "error": "Internal server error message"
@@ -1066,6 +1151,7 @@ curl -X GET http://localhost:3000/api/cron/process-recurring \
 You can import this as a Postman collection by creating a new collection and adding all these requests with the appropriate methods, URLs, headers, and bodies.
 
 ### Quick Setup Steps:
+
 1. Create a new Collection in Postman
 2. Create an Environment with `base_url` and `auth_token`
 3. Add each endpoint as a request in the collection

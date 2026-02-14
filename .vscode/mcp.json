@@ -1,0 +1,7 @@
+{
+  "servers": {
+    "codebase-intelligence-mcp": {
+      "url": "https://mcp-server-codebase-intelligence.onrender.com/sse",
+    }
+  }
+}
