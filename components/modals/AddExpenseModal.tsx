@@ -1,24 +1,32 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
-import { ensureUserProfile } from '@/lib/ensure-profile';
-import { X, Upload, FileImage, Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { ensureUserProfile } from '@/lib/ensure-profile';
+import { supabase } from '@/lib/supabase';
+import { FileImage, Loader2, Upload } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-export default function AddExpenseModal({ user, categories, onClose, onSuccess }: any) {
+interface AddExpenseModalProps {
+  user: any;
+  categories: any[];
+  onClose: () => void;
+  onSuccess: () => void;
+  expense?: any;
+}
+
+export default function AddExpenseModal({ user, categories, onClose, onSuccess, expense }: AddExpenseModalProps) {
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [description, setDescription] = useState('');
@@ -29,6 +37,16 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (expense) {
+      setAmount(expense.amount.toString());
+      setCategoryId(expense.category_id || '');
+      setDescription(expense.description || '');
+      setDate(expense.date);
+      setReceiptUrl(expense.receipt_url || '');
+    }
+  }, [expense]);
 
   const handleFileChange = async (file: File) => {
     if (!file) return;
@@ -119,29 +137,67 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
     setLoading(true);
 
     try {
-      // Ensure user profile exists (fallback)
-      await ensureUserProfile(user.id, user.email, user.user_metadata?.full_name);
-
-      const { error: insertError } = await supabase.from('expenses').insert([
-        {
-          user_id: user.id,
-          amount: parseFloat(amount),
-          category_id: categoryId || null,
-          description,
-          date,
-          receipt_url: receiptUrl || null,
-        },
-      ]);
-
-      if (insertError) {
-        toast.error(insertError.message);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please log in to continue');
         setLoading(false);
-      } else {
-        toast.success('Expense added successfully');
-        onSuccess();
+        return;
       }
+
+      const token = session.access_token;
+
+      if (expense) {
+        // Update existing expense
+        const response = await fetch('/api/expenses', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            id: expense.id,
+            amount: parseFloat(amount),
+            category_id: categoryId || null,
+            description: description || null,
+            date,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to update expense');
+        }
+
+        toast.success('Expense updated successfully');
+      } else {
+        // Create new expense
+        await ensureUserProfile(user.id, user.email, user.user_metadata?.full_name);
+
+        const { error: insertError } = await supabase.from('expenses').insert([
+          {
+            user_id: user.id,
+            amount: parseFloat(amount),
+            category_id: categoryId || null,
+            description,
+            date,
+            receipt_url: receiptUrl || null,
+          },
+        ]);
+
+        if (insertError) {
+          throw new Error(insertError.message);
+        }
+
+        toast.success('Expense added successfully');
+      }
+
+      onSuccess();
     } catch (err: any) {
       toast.error(err.message || 'An error occurred');
+    } finally {
       setLoading(false);
     }
   };
@@ -150,7 +206,7 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Expense</DialogTitle>
+          <DialogTitle>{expense ? 'Edit Expense' : 'Add Expense'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -252,7 +308,7 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess }
             </Button>
             <Button type="submit" disabled={loading || uploadingReceipt}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Add Expense
+              {expense ? 'Update Expense' : 'Add Expense'}
             </Button>
           </div>
         </form>

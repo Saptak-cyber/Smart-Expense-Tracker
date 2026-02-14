@@ -74,6 +74,36 @@ const functions: FunctionDeclaration[] = [
       required: ['budget_id', 'monthly_limit'],
     },
   },
+  {
+    name: 'update_expense',
+    description: 'Update an existing expense transaction',
+    parameters: {
+      type: SchemaType.OBJECT,
+      properties: {
+        expense_id: {
+          type: SchemaType.STRING,
+          description: 'The ID of the expense to update',
+        },
+        amount: {
+          type: SchemaType.NUMBER,
+          description: 'The new expense amount',
+        },
+        category_id: {
+          type: SchemaType.STRING,
+          description: 'The new category ID for the expense',
+        },
+        description: {
+          type: SchemaType.STRING,
+          description: 'The new description of the expense',
+        },
+        date: {
+          type: SchemaType.STRING,
+          description: 'The new date of the expense in YYYY-MM-DD format',
+        },
+      },
+      required: ['expense_id'],
+    },
+  },
 ];
 
 export async function generateInsight(prompt: string): Promise<string> {
@@ -109,11 +139,17 @@ You can perform the following actions when the user requests:
 1. Create budgets - Use create_budget function when user wants to set a budget
 2. Add expenses - Use add_expense function when user wants to record an expense
 3. Update budgets - Use update_budget function when user wants to change a budget amount
+4. Update expenses - Use update_expense function when user wants to modify an existing expense
+
+IMPORTANT RESTRICTIONS:
+- You CANNOT delete budgets or expenses. If a user asks to delete, politely inform them: "I can't delete budgets or expenses through chat. You can only create and update them here. To delete, please use the delete button in the Budgets or Expenses page."
+- Only create, add, and update operations are supported through this chat interface
 
 User question: ${userQuery}
 
 Instructions:
-- If the user asks you to create a budget, add an expense, or update a budget, use the appropriate function
+- If the user asks you to create a budget, add an expense, update a budget, or update an expense, use the appropriate function
+- If the user asks to delete a budget or expense, politely decline and explain they need to use the UI
 - When using functions, extract the necessary information from the user's request
 - For dates, use today's date if not specified: ${new Date().toISOString().split('T')[0]}
 - For months, use the current month if not specified: ${new Date().getMonth() + 1}
@@ -127,15 +163,22 @@ Instructions:
 
 export async function generateInsightWithActions(
   prompt: string,
-  categories: any[]
+  categories: any[],
+  conversationHistory: Array<{ role: string; content: string }> = []
 ): Promise<{ response: string; functionCalls?: any[] }> {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash-lite',
     tools: [{ functionDeclarations: functions }],
   });
 
+  // Convert conversation history to Gemini format
+  const history = conversationHistory.map((msg) => ({
+    role: msg.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: msg.content }],
+  }));
+
   const chat = model.startChat({
-    history: [],
+    history: history,
   });
 
   // Add category information to help AI map category names to IDs

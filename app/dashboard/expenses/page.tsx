@@ -22,6 +22,7 @@ export default function ExpensesPage() {
   const [user, setUser] = useState<any>(null);
   const [categories, setCategories] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<any>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -98,6 +99,47 @@ export default function ExpensesPage() {
     } catch (error) {
       toast.error('Failed to export expenses');
     }
+  };
+
+  const handleEdit = (expense: any) => {
+    setEditingExpense(expense);
+    setShowAddModal(true);
+  };
+
+  const handleDelete = async (expenseId: string) => {
+    if (!confirm('Are you sure you want to delete this expense?')) return;
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please log in to continue');
+        return;
+      }
+
+      const response = await fetch(`/api/expenses?id=${expenseId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete expense');
+      }
+
+      toast.success('Expense deleted successfully');
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete expense');
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowAddModal(false);
+    setEditingExpense(null);
   };
 
   const allExpenses = data?.pages?.flatMap((page) => page.data) || [];
@@ -187,20 +229,14 @@ export default function ExpensesPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          // TODO: Implement edit
-                          toast.info('Edit functionality coming soon');
-                        }}
+                        onClick={() => handleEdit(expense)}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          // TODO: Implement delete
-                          toast.info('Delete functionality coming soon');
-                        }}
+                        onClick={() => handleDelete(expense.id)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
@@ -226,10 +262,11 @@ export default function ExpensesPage() {
         <AddExpenseModal
           user={user}
           categories={categories}
-          onClose={() => setShowAddModal(false)}
+          expense={editingExpense}
+          onClose={handleModalClose}
           onSuccess={() => {
-            setShowAddModal(false);
-            toast.success('Expense added successfully');
+            handleModalClose();
+            window.location.reload();
           }}
         />
       )}

@@ -99,6 +99,41 @@ async function executeFunctionCall(
         return { success: true, result: data };
       }
 
+      case 'update_expense': {
+        const { expense_id, amount, category_id, description, date } = args;
+
+        // Verify expense belongs to user
+        const { data: existing } = await supabaseClient
+          .from('expenses')
+          .select('user_id')
+          .eq('id', expense_id)
+          .single();
+
+        if (!existing || existing.user_id !== userId) {
+          return { success: false, result: null, error: 'Expense not found' };
+        }
+
+        // Build update object with only provided fields
+        const updates: any = {};
+        if (amount !== undefined) updates.amount = amount;
+        if (category_id !== undefined) updates.category_id = category_id;
+        if (description !== undefined) updates.description = description;
+        if (date !== undefined) updates.date = date;
+
+        const { data, error } = await supabaseClient
+          .from('expenses')
+          .update(updates)
+          .eq('id', expense_id)
+          .select('*, categories(*)')
+          .single();
+
+        if (error) {
+          return { success: false, result: null, error: error.message };
+        }
+
+        return { success: true, result: data };
+      }
+
       default:
         return { success: false, result: null, error: `Unknown function: ${name}` };
     }
@@ -141,6 +176,17 @@ export async function POST(request: NextRequest) {
 
   const supabaseClient = getSupabaseAuthed(request);
 
+  // Fetch recent chat history for context (last 10 messages)
+  const { data: chatHistory } = await supabaseClient
+    .from('chat_history')
+    .select('role, content')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  // Reverse to get chronological order
+  const conversationHistory = (chatHistory || []).reverse();
+
   // Fetch user expenses
   let expensesQuery = supabaseClient
     .from('expenses')
@@ -176,7 +222,7 @@ export async function POST(request: NextRequest) {
   );
 
   try {
-    const aiResponse = await generateInsightWithActions(prompt, categories || []);
+    const aiResponse = await generateInsightWithActions(prompt, categories || [], conversationHistory);
 
     // Check if AI wants to execute functions
     if (aiResponse.functionCalls && aiResponse.functionCalls.length > 0) {
@@ -203,6 +249,8 @@ export async function POST(request: NextRequest) {
             responseText += `• Added expense of ₹${action.result.amount} for ${action.result.description}\n`;
           } else if (functionName === 'update_budget') {
             responseText += `• Updated budget to ₹${action.result.monthly_limit} for ${action.result.categories.name}\n`;
+          } else if (functionName === 'update_expense') {
+            responseText += `• Updated expense of ₹${action.result.amount} for ${action.result.description}\n`;
           }
         });
       }
