@@ -3,7 +3,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function generateInsight(prompt: string): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  // Using gemini-2.5-flash-lite: Free tier, highest throughput
+  // Rate limits: 15 RPM, 1,000 RPD (highest!), 250K TPM
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
   const result = await model.generateContent(prompt);
   const response = result.response;
