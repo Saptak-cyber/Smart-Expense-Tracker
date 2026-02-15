@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Maximum execution time in seconds
 
 const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
 const supabaseServiceKey =
@@ -43,9 +44,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size (100MB max)
-    if (file.size > 100 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 100MB' }, { status: 400 });
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File too large. Maximum size is 10MB' }, { status: 400 });
     }
 
     const userId = auth.user!.id;

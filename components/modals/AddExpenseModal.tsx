@@ -64,9 +64,9 @@ export default function AddExpenseModal({
       return;
     }
 
-    // Validate file size (100MB)
-    if (file.size > 100 * 1024 * 1024) {
-      toast.error('File too large. Maximum size is 100MB');
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File too large. Maximum size is 10MB');
       return;
     }
 
@@ -258,7 +258,7 @@ export default function AddExpenseModal({
                 <div className="flex flex-col items-center">
                   <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                   <p className="text-sm text-muted-foreground">Drag & drop or click to upload</p>
-                  <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, PDF • Max 100MB</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPEG, PNG, PDF • Max 10MB</p>
                 </div>
               )}
             </div>
