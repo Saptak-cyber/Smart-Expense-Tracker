@@ -211,3 +211,101 @@ export function matchCategory(
   const otherCategory = userCategories.find((cat) => cat.name.toLowerCase() === 'other');
   return otherCategory?.id || null;
 }
+
+/**
+ * Generate AI-powered analytics insights using Groq's reasoning model
+ * @param expenses - User's expense data
+ * @param categoryBreakdown - Category spending breakdown
+ * @param monthlyTrends - Monthly spending trends
+ * @param budgets - User's budget data
+ * @returns Array of insight strings
+ */
+export async function generateAnalyticsInsights(
+  expenses: any[],
+  categoryBreakdown: any[],
+  monthlyTrends: any[],
+  budgets: any[]
+): Promise<string[]> {
+  try {
+    // Prepare data summary for the AI
+    const totalSpent = categoryBreakdown.reduce((sum, cat) => sum + cat.value, 0);
+    const expenseCount = expenses.length;
+    const avgExpense = expenseCount > 0 ? totalSpent / expenseCount : 0;
+
+    // Get top 3 categories
+    const topCategories = categoryBreakdown
+      .slice(0, 3)
+      .map((cat) => `${cat.name}: ₹${cat.value.toFixed(2)} (${cat.percentage.toFixed(1)}%)`)
+      .join(', ');
+
+    // Get recent trend
+    const recentTrends =
+      monthlyTrends.length >= 2
+        ? monthlyTrends
+            .slice(-3)
+            .map((m) => `${m.month}: ₹${m.total}`)
+            .join(', ')
+        : 'Not enough data';
+
+    // Budget status
+    const budgetSummary = budgets
+      .map((b) => {
+        const spent = expenses
+          .filter((e) => e.category_id === b.category_id)
+          .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+        const percentage = (spent / parseFloat(b.monthly_limit)) * 100;
+        return `${b.categories?.name || 'Unknown'}: ${percentage.toFixed(0)}% used`;
+      })
+      .join(', ');
+
+    const prompt = `You are a financial advisor analyzing a user's expense data. Provide 3-5 actionable insights based on the following data:
+
+Total Expenses: ${expenseCount}
+Total Spent: ₹${totalSpent.toFixed(2)}
+Average per Expense: ₹${avgExpense.toFixed(2)}
+
+Top Spending Categories: ${topCategories}
+Recent Monthly Trends: ${recentTrends}
+Budget Status: ${budgetSummary || 'No budgets set'}
+
+Provide insights that are:
+1. Specific and actionable
+2. Based on the actual data provided
+3. Helpful for improving financial habits
+4. Concise (1-2 sentences each)
+
+Return ONLY a JSON array of insight strings, nothing else. Example format:
+["Insight 1 text here", "Insight 2 text here", "Insight 3 text here"]`;
+
+    const completion = await groq.chat.completions.create({
+      model: 'openai/gpt-oss-120b',
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.6,
+      max_completion_tokens: 2048,
+      include_reasoning: false, // We only want the final answer, not the reasoning process
+    });
+
+    const responseText = completion.choices[0]?.message?.content || '[]';
+
+    // Extract JSON array from response
+    const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+    const jsonString = jsonMatch ? jsonMatch[0] : responseText;
+
+    const insights = JSON.parse(jsonString);
+
+    // Validate that we got an array of strings
+    if (!Array.isArray(insights)) {
+      throw new Error('Invalid response format');
+    }
+
+    return insights.filter((insight) => typeof insight === 'string' && insight.length > 0);
+  } catch (error) {
+    console.error('Groq analytics insights error:', error);
+    throw new Error('Failed to generate AI insights');
+  }
+}

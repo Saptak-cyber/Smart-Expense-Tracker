@@ -8,15 +8,15 @@ import TopMerchants from '@/components/analytics/TopMerchants';
 import ModernLayout from '@/components/layout/ModernLayout';
 import { Button } from '@/components/ui/button';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { supabase } from '@/lib/supabase';
 import jsPDF from 'jspdf';
-import { FileSpreadsheet, FileText, Loader2 } from 'lucide-react';
+import { FileSpreadsheet, FileText, Lightbulb, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -27,6 +27,8 @@ export default function AnalyticsPage() {
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('1');
+  const [aiInsights, setAiInsights] = useState<any[]>([]);
+  const [generatingInsights, setGeneratingInsights] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -74,6 +76,45 @@ export default function AnalyticsPage() {
       toast.error('Failed to load analytics');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateAIInsights = async () => {
+    if (!analyticsData) return;
+
+    setGeneratingInsights(true);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/login');
+        return;
+      }
+
+      const response = await fetch('/api/analytics/ai-insights', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          expenses: analyticsData.summary,
+          categoryBreakdown: analyticsData.categoryBreakdown,
+          monthlyTrends: analyticsData.monthlyTrends,
+          budgetPerformance: analyticsData.budgetPerformance,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate AI insights');
+
+      const data = await response.json();
+      setAiInsights(data.insights);
+      toast.success('AI insights generated successfully');
+    } catch (error) {
+      toast.error('Failed to generate AI insights');
+    } finally {
+      setGeneratingInsights(false);
     }
   };
 
@@ -229,7 +270,52 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Insights */}
-            <InsightsPanel insights={analyticsData.insights} />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Lightbulb className="h-5 w-5 text-primary" />
+                  <h3 className="text-lg font-semibold">Insights</h3>
+                </div>
+                <Button
+                  onClick={generateAIInsights}
+                  disabled={generatingInsights}
+                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                >
+                  {generatingInsights ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Lightbulb className="mr-2 h-4 w-4" />
+                      Generate AI Insights
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {aiInsights.length > 0 && (
+                <div className="p-6 bg-gradient-to-br from-violet-500/10 to-purple-500/10 rounded-lg border border-violet-500/20">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Lightbulb className="h-5 w-5 text-violet-500" />
+                    <h4 className="text-md font-semibold">AI-Powered Insights</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {aiInsights.map((insight, index) => (
+                      <div
+                        key={index}
+                        className="p-4 bg-card/80 backdrop-blur rounded-lg border border-violet-500/20"
+                      >
+                        <p className="text-sm">{insight}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <InsightsPanel insights={analyticsData.insights} />
+            </div>
           </>
         ) : null}
       </div>

@@ -1,6 +1,5 @@
 import { requireAuth } from '@/lib/auth-utils';
 import { getEnv } from '@/lib/env';
-import { generateAnalyticsInsights } from '@/lib/gemini';
 import { createClient } from '@supabase/supabase-js';
 import { endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
 import { NextRequest, NextResponse } from 'next/server';
@@ -230,7 +229,8 @@ export async function GET(request: NextRequest) {
     if (monthlyTrends.length >= 3) {
       const amounts = monthlyTrends.map((m) => m.total);
       const avg = amounts.reduce((sum, val) => sum + val, 0) / amounts.length;
-      const variance = amounts.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / amounts.length;
+      const variance =
+        amounts.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / amounts.length;
       const stdDev = Math.sqrt(variance);
       const coefficientOfVariation = (stdDev / avg) * 100;
 
@@ -253,7 +253,7 @@ export async function GET(request: NextRequest) {
     if (expenses && expenses.length > 0) {
       const avgExpense = totalSpent / expenses.length;
       const highValueExpenses = expenses.filter((e) => parseFloat(e.amount) > avgExpense * 3);
-      
+
       if (highValueExpenses.length > 0) {
         const highValueTotal = highValueExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
         const highValuePercentage = ((highValueTotal / totalSpent) * 100).toFixed(0);
@@ -270,7 +270,7 @@ export async function GET(request: NextRequest) {
       const topThreePercentage = categoryBreakdown
         .slice(0, 3)
         .reduce((sum, cat) => sum + cat.percentage, 0);
-      
+
       if (topThreePercentage > 80) {
         insights.push({
           type: 'info',
@@ -315,29 +315,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate AI-powered insights using Gemini
-    let aiInsights: string[] = [];
-    try {
-      if (process.env.GEMINI_API_KEY && expenses && expenses.length > 0) {
-        aiInsights = await generateAnalyticsInsights(
-          expenses,
-          categoryBreakdown,
-          monthlyTrends,
-          budgets || []
-        );
-        
-        // Add AI insights to the insights array
-        aiInsights.forEach((insight) => {
-          insights.push({
-            type: 'info',
-            title: '🤖 AI Insight',
-            description: insight,
-          });
-        });
-      }
-    } catch (error) {
-      console.error('Failed to generate AI insights:', error);
-      // Continue without AI insights if generation fails
-    }
+    // Note: AI insights are now generated on-demand via the /api/analytics/ai-insights endpoint
+    // This prevents automatic generation on every page load
 
     return NextResponse.json({
       monthlyTrends,
