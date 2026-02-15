@@ -1,20 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { ensureUserProfile } from '@/lib/ensure-profile';
-import { useRouter } from 'next/navigation';
-import ModernLayout from '@/components/layout/ModernLayout';
-import EnhancedStatsCard from '@/components/dashboard/EnhancedStatsCard';
-import ExpenseChart from '@/components/charts/ExpenseChart';
 import CategoryPieChart from '@/components/charts/CategoryPieChart';
-import RecentExpenses from '@/components/dashboard/RecentExpenses';
+import ExpenseChart from '@/components/charts/ExpenseChart';
+import EnhancedStatsCard from '@/components/dashboard/EnhancedStatsCard';
 import InsightCard from '@/components/dashboard/InsightCard';
-import { TrendingDown, CreditCard, Calendar, Target } from 'lucide-react';
+import RecentExpenses from '@/components/dashboard/RecentExpenses';
+import ModernLayout from '@/components/layout/ModernLayout';
+import { ensureUserProfile } from '@/lib/ensure-profile';
+import { supabase } from '@/lib/supabase';
+import { Calendar, CreditCard, Target, TrendingDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [expenses, setExpenses] = useState<any[]>([]);
+  const [budgets, setBudgets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -46,6 +47,19 @@ export default function DashboardPage() {
       .limit(50);
 
     setExpenses(data || []);
+    await loadBudgets(userId);
+  };
+
+  const loadBudgets = async (userId: string) => {
+    const now = new Date();
+    const { data } = await supabase
+      .from('budgets')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('month', now.getMonth() + 1)
+      .eq('year', now.getFullYear());
+
+    setBudgets(data || []);
     setLoading(false);
   };
 
@@ -105,8 +119,8 @@ export default function DashboardPage() {
 
   const avgTransaction = expenses.length > 0 ? totalSpent / expenses.length : 0;
 
-  const budgetTotal = 50000;
-  const budgetUsed = (monthlyTotal / budgetTotal) * 100;
+  const budgetTotal = budgets.reduce((sum, b) => sum + parseFloat(b.monthly_limit), 0);
+  const budgetUsed = budgetTotal > 0 ? (monthlyTotal / budgetTotal) * 100 : 0;
 
   return (
     <ModernLayout user={user}>
@@ -159,7 +173,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        <InsightCard />
+        {/* <InsightCard /> */}
 
         <div className="grid lg:grid-cols-2 gap-6">
           <ExpenseChart expenses={expenses} />

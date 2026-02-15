@@ -5,11 +5,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { ensureUserProfile } from '@/lib/ensure-profile';
@@ -26,7 +26,13 @@ interface AddExpenseModalProps {
   expense?: any;
 }
 
-export default function AddExpenseModal({ user, categories, onClose, onSuccess, expense }: AddExpenseModalProps) {
+export default function AddExpenseModal({
+  user,
+  categories,
+  onClose,
+  onSuccess,
+  expense,
+}: AddExpenseModalProps) {
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [description, setDescription] = useState('');
@@ -97,9 +103,17 @@ export default function AddExpenseModal({ user, categories, onClose, onSuccess, 
 
       // Auto-fill OCR data if available
       if (data.ocr) {
+        console.log('OCR Data received:', data.ocr);
         if (data.ocr.amount) setAmount(data.ocr.amount.toString());
         if (data.ocr.date) setDate(data.ocr.date);
         if (data.ocr.merchant && !description) setDescription(data.ocr.merchant);
+        if (data.ocr.category_id) {
+          console.log('Setting category ID:', data.ocr.category_id);
+          setCategoryId(data.ocr.category_id);
+        } else {
+          console.log('No category_id in OCR data');
+        }
+
         toast.success('Receipt uploaded and data extracted!');
       } else {
         toast.success('Receipt uploaded successfully');

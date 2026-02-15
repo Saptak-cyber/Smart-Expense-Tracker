@@ -8,8 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-
-
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test:build": "npm run type-check && npm run lint && npm run build",
@@ -37,6 +35,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.0.3",
+    "groq-sdk": "^0.37.0",
     "jspdf": "^4.1.0",
     "lucide-react": "^0.316.0",
     "next": "14.1.0",
