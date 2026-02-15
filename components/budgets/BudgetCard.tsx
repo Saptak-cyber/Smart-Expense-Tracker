@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Budget, Expense } from '@/types';
-import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { Budget } from '@/types';
+import { AlertCircle, TrendingDown, TrendingUp } from 'lucide-react';
 
 interface BudgetCardProps {
   budget: Budget;
@@ -17,18 +16,34 @@ export function BudgetCard({ budget, spent, onEdit, onDelete }: BudgetCardProps)
   const percentage = (spent / budget.monthly_limit) * 100;
   const remaining = budget.monthly_limit - spent;
   const isOverBudget = spent > budget.monthly_limit;
-  const isNearLimit = percentage >= 80 && !isOverBudget;
+
+  // Smart budget alert thresholds: 75%, 90%, 100%
+  const isCritical = percentage >= 90 && !isOverBudget;
+  const isWarning = percentage >= 75 && percentage < 90;
+  const isApproaching = percentage >= 60 && percentage < 75;
 
   const getStatusColor = () => {
     if (isOverBudget) return 'text-destructive';
-    if (isNearLimit) return 'text-yellow-500';
+    if (isCritical) return 'text-orange-500';
+    if (isWarning) return 'text-yellow-500';
+    if (isApproaching) return 'text-blue-500';
     return 'text-green-500';
   };
 
   const getProgressColor = () => {
     if (isOverBudget) return 'bg-destructive';
-    if (isNearLimit) return 'bg-yellow-500';
+    if (isCritical) return 'bg-orange-500';
+    if (isWarning) return 'bg-yellow-500';
+    if (isApproaching) return 'bg-blue-500';
     return 'bg-primary';
+  };
+
+  const getStatusLabel = () => {
+    if (isOverBudget) return 'Over budget';
+    if (isCritical) return 'Critical (90%+)';
+    if (isWarning) return 'Warning (75%+)';
+    if (isApproaching) return 'Approaching (60%+)';
+    return 'On track';
   };
 
   return (
@@ -82,16 +97,10 @@ export function BudgetCard({ budget, spent, onEdit, onDelete }: BudgetCardProps)
             <Progress value={Math.min(percentage, 100)} className="h-2" />
             <div className="flex justify-between items-center text-xs">
               <span className={getStatusColor()}>{percentage.toFixed(0)}% used</span>
-              {isNearLimit && !isOverBudget && (
-                <span className="flex items-center gap-1 text-yellow-500">
+              {(isApproaching || isWarning || isCritical || isOverBudget) && (
+                <span className={`flex items-center gap-1 ${getStatusColor()}`}>
                   <AlertCircle className="h-3 w-3" />
-                  Near limit
-                </span>
-              )}
-              {isOverBudget && (
-                <span className="flex items-center gap-1 text-destructive">
-                  <AlertCircle className="h-3 w-3" />
-                  Over budget
+                  {getStatusLabel()}
                 </span>
               )}
             </div>

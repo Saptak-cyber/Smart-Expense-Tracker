@@ -3,7 +3,6 @@
 import CategoryPieChart from '@/components/charts/CategoryPieChart';
 import ExpenseChart from '@/components/charts/ExpenseChart';
 import EnhancedStatsCard from '@/components/dashboard/EnhancedStatsCard';
-import InsightCard from '@/components/dashboard/InsightCard';
 import RecentExpenses from '@/components/dashboard/RecentExpenses';
 import ModernLayout from '@/components/layout/ModernLayout';
 import { ensureUserProfile } from '@/lib/ensure-profile';
@@ -99,7 +98,7 @@ export default function DashboardPage() {
   const lastMonthTotal = lastMonth.reduce((sum, e) => sum + parseFloat(e.amount), 0);
 
   const monthlyTrend =
-    lastMonthTotal > 0 ? ((monthlyTotal - lastMonthTotal) / lastMonthTotal) * 100 : 0;
+    lastMonthTotal > 0 ? ((monthlyTotal - lastMonthTotal) / lastMonthTotal) * 100 : undefined;
 
   const thisWeek = expenses.filter((e) => {
     const expenseDate = new Date(e.date);

@@ -1,7 +1,7 @@
 'use client';
 
-import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
 
 interface StatsCardProps {
   title: string;
@@ -24,9 +24,9 @@ export default function EnhancedStatsCard({
   prefix = '',
   loading = false,
 }: StatsCardProps) {
-  const isPositive = trend && trend > 0;
-  const isNegative = trend && trend < 0;
-  const isNeutral = trend === 0;
+  const isPositive = trend !== undefined && trend > 0;
+  const isNegative = trend !== undefined && trend < 0;
+  const isNeutral = trend !== undefined && trend === 0;
 
   // Simple sparkline path generation
   const generateSparkline = (data: number[]) => {

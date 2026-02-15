@@ -110,13 +110,23 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
 
-    // Calculate top merchants (from descriptions)
+    // Calculate top merchants (from descriptions) with improved normalization
     const merchantMap = new Map<string, { amount: number; count: number }>();
     expenses?.forEach((e) => {
       if (e.description) {
-        const merchant = e.description.split(' ')[0]; // Simple heuristic
-        const current = merchantMap.get(merchant) || { amount: 0, count: 0 };
-        merchantMap.set(merchant, {
+        // Improved merchant extraction: normalize and clean merchant names
+        let merchant = e.description.trim();
+
+        // Take first 2-3 words for better merchant identification
+        const words = merchant.split(/\s+/);
+        if (words.length > 3) {
+          merchant = words.slice(0, 3).join(' ');
+        }
+
+        // Normalize: lowercase for grouping, then capitalize for display
+        const normalizedKey = merchant.toLowerCase();
+        const current = merchantMap.get(normalizedKey) || { amount: 0, count: 0 };
+        merchantMap.set(normalizedKey, {
           amount: current.amount + parseFloat(e.amount),
           count: current.count + 1,
         });
@@ -125,10 +135,13 @@ export async function GET(request: NextRequest) {
 
     const topMerchants = Array.from(merchantMap.entries())
       .map(([merchant, data]) => ({
-        merchant,
+        merchant: merchant
+          .split(' ')
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' '), // Capitalize
         amount: parseFloat(data.amount.toFixed(2)),
         count: data.count,
-        trend: 'neutral' as const,
+        avgTransaction: parseFloat((data.amount / data.count).toFixed(2)),
       }))
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 5);
@@ -150,13 +163,27 @@ export async function GET(request: NextRequest) {
         const spent = categoryExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
         const percentage = (spent / parseFloat(budget.monthly_limit)) * 100;
 
+        // Smart budget alert system: 75%, 90%, 100%
+        let status: 'good' | 'approaching' | 'warning' | 'critical' | 'exceeded';
+        if (percentage >= 100) {
+          status = 'exceeded';
+        } else if (percentage >= 90) {
+          status = 'critical';
+        } else if (percentage >= 75) {
+          status = 'warning';
+        } else if (percentage >= 60) {
+          status = 'approaching';
+        } else {
+          status = 'good';
+        }
+
         return {
           category: budget.categories?.name || 'Unknown',
           limit: parseFloat(budget.monthly_limit),
           spent: parseFloat(spent.toFixed(2)),
           remaining: parseFloat((parseFloat(budget.monthly_limit) - spent).toFixed(2)),
           percentage: parseFloat(percentage.toFixed(2)),
-          status: percentage >= 100 ? 'exceeded' : percentage >= 80 ? 'warning' : 'good',
+          status,
         };
       }) || [];
 
@@ -182,23 +209,49 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Budget warnings
+    // Smart budget alerts at 75%, 90%, 100%
     const exceededBudgets = budgetPerformance.filter((b) => b.status === 'exceeded');
     if (exceededBudgets.length > 0) {
       insights.push({
         type: 'negative',
-        title: 'Budget Alert',
-        description: `You've exceeded ${exceededBudgets.length} budget(s) this month`,
+        title: 'Budget Exceeded',
+        description: `You've exceeded ${exceededBudgets.length} budget(s) this month. Review your spending immediately.`,
       });
     }
 
-    // Budget approaching limit
+    // Critical alert at 90%
+    const criticalBudgets = budgetPerformance.filter((b) => b.status === 'critical');
+    if (criticalBudgets.length > 0) {
+      const budgetNames = criticalBudgets.map((b) => b.category).join(', ');
+      insights.push({
+        type: 'negative',
+        title: 'Critical Budget Alert (90%+)',
+        description: `${budgetNames}: You're at 90%+ of your limit. Slow down spending to avoid exceeding.`,
+      });
+    }
+
+    // Warning at 75%
     const warningBudgets = budgetPerformance.filter((b) => b.status === 'warning');
     if (warningBudgets.length > 0) {
+      const budgetNames = warningBudgets.map((b) => b.category).join(', ');
       insights.push({
         type: 'warning',
-        title: 'Budget Warning',
-        description: `${warningBudgets.length} budget(s) are at 80% or more of their limit`,
+        title: 'Budget Warning (75%+)',
+        description: `${budgetNames}: You've used 75%+ of your budget. Monitor your spending closely.`,
+      });
+    }
+
+    // Approaching limit at 60%
+    const approachingBudgets = budgetPerformance.filter((b) => b.status === 'approaching');
+    if (
+      approachingBudgets.length > 0 &&
+      exceededBudgets.length === 0 &&
+      criticalBudgets.length === 0
+    ) {
+      insights.push({
+        type: 'info',
+        title: 'Budget Approaching Limit',
+        description: `${approachingBudgets.length} budget(s) are at 60%+ of their limit. Plan your spending carefully.`,
       });
     }
 
