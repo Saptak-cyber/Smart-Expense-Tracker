@@ -314,7 +314,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Generate AI-powered insights using Gemini
+    // Generate AI-powered insights using Gpt
     // Note: AI insights are now generated on-demand via the /api/analytics/ai-insights endpoint
     // This prevents automatic generation on every page load
 

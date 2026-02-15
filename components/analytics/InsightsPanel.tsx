@@ -41,7 +41,7 @@ export default function InsightsPanel({ insights }: InsightsPanelProps) {
     <div className="p-6 bg-card rounded-lg border">
       <div className="flex items-center space-x-2 mb-4">
         <Lightbulb className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-semibold">AI Insights</h3>
+        <h3 className="text-lg font-semibold">Rule Based Insights</h3>
       </div>
 
       <div className="space-y-3">
