@@ -10,7 +10,7 @@ export const maxDuration = 60; // Maximum execution time in seconds
 
 const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
 const supabaseServiceKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  process.env.SUPABASE_SERVICE_ROLE_KEY ?? getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
 // Use service role for storage operations (bypass RLS)
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
@@ -49,8 +49,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File too large. Maximum size is 10MB' }, { status: 400 });
     }
 
-    const userId = auth.user!.id;
-    const fileName = `${userId}/${Date.now()}_${file.name}`;
+    const userId = auth.user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+    }
+
+    // Sanitize filename: replace spaces and special characters
+    const sanitizedFileName = file.name
+      .replace(/\s+/g, '_') // Replace spaces with underscores
+      .replace(/[^a-zA-Z0-9._-]/g, '_'); // Replace special chars with underscores
+    const fileName = `${userId}/${Date.now()}_${sanitizedFileName}`;
 
     // Upload to Supabase Storage
     const arrayBuffer = await file.arrayBuffer();
@@ -81,26 +89,16 @@ export async function POST(request: NextRequest) {
           .select('id, name')
           .order('name');
 
-        console.log('Available categories:', JSON.stringify(categories, null, 2));
-
         // Convert image to base64
         const base64Image = Buffer.from(arrayBuffer).toString('base64');
 
         // Extract receipt data using Groq Llama Vision with user's categories
-        const extractedData = await extractReceiptData(base64Image, categories || []);
-        console.log('Extracted data from Groq:', JSON.stringify(extractedData, null, 2));
+        const extractedData = await extractReceiptData(base64Image, categories ?? []);
 
         // Match extracted category to user's categories (defaults to "Other" if no match)
         const categoryId = extractedData.category
-          ? matchCategory(extractedData.category, categories || [])
+          ? matchCategory(extractedData.category, categories ?? [])
           : null;
-
-        console.log('Extracted category:', extractedData.category);
-        console.log('Matched category ID:', categoryId);
-        if (categoryId) {
-          const matchedCat = categories?.find((c) => c.id === categoryId);
-          console.log('Matched category name:', matchedCat?.name);
-        }
 
         ocrData = {
           amount: extractedData.amount,
@@ -109,8 +107,6 @@ export async function POST(request: NextRequest) {
           category_id: categoryId,
           category_name: extractedData.category,
         };
-
-        console.log('Final OCR data:', JSON.stringify(ocrData, null, 2));
       } catch (error) {
         console.error('OCR error:', error);
         // OCR is optional, so we continue even if it fails
@@ -122,12 +118,10 @@ export async function POST(request: NextRequest) {
       ocr: ocrData,
       fileName: uploadData.path,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Receipt upload error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to upload receipt' },
-      { status: 500 }
-    );
+    const errorMessage = error instanceof Error ? error.message : 'Failed to upload receipt';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
@@ -143,7 +137,10 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'File name is required' }, { status: 400 });
   }
 
-  const userId = auth.user!.id;
+  const userId = auth.user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: 'User not authenticated' }, { status: 401 });
+  }
 
   // Verify the file belongs to the user
   if (!fileName.startsWith(`${userId}/`)) {
