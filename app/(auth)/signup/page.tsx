@@ -1,26 +1,23 @@
 'use client';
 
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { supabase } from '@/lib/supabase';
 import {
   Eye,
   EyeOff,
   Loader2,
-  Mail,
   Lock,
-  User,
+  Mail,
   Sparkles,
   TrendingUp,
-  Check,
-  X,
+  User
 } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -46,29 +43,7 @@ export default function SignupPage() {
     return true;
   };
 
-  const getPasswordStrength = () => {
-    if (!password) return { strength: 0, text: '', color: '' };
 
-    let strength = 0;
-    if (password.length >= 8) strength += 25;
-    if (password.length >= 12) strength += 25;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
-    if (/[0-9]/.test(password)) strength += 15;
-    if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
-
-    if (strength < 40) return { strength, text: 'Weak', color: 'bg-red-500' };
-    if (strength < 70) return { strength, text: 'Fair', color: 'bg-yellow-500' };
-    if (strength < 90) return { strength, text: 'Good', color: 'bg-blue-500' };
-    return { strength, text: 'Strong', color: 'bg-green-500' };
-  };
-
-  const passwordStrength = getPasswordStrength();
-
-  const passwordRequirements = [
-    { met: password.length >= 8, text: 'At least 8 characters' },
-    { met: /[a-z]/.test(password) && /[A-Z]/.test(password), text: 'Upper & lowercase letters' },
-    { met: /[0-9]/.test(password), text: 'Contains numbers' },
-  ];
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,12 +51,6 @@ export default function SignupPage() {
     setError('');
 
     if (!validateEmail(email)) {
-      setLoading(false);
-      return;
-    }
-
-    if (passwordStrength.strength < 40) {
-      setError('Please choose a stronger password');
       setLoading(false);
       return;
     }
@@ -224,44 +193,6 @@ export default function SignupPage() {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-
-              {/* Password Strength Indicator */}
-              {password && (
-                <div className="space-y-2 mt-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Password strength:</span>
-                    <span
-                      className={`font-medium ${
-                        passwordStrength.text === 'Weak'
-                          ? 'text-red-400'
-                          : passwordStrength.text === 'Fair'
-                            ? 'text-yellow-400'
-                            : passwordStrength.text === 'Good'
-                              ? 'text-blue-400'
-                              : 'text-green-400'
-                      }`}
-                    >
-                      {passwordStrength.text}
-                    </span>
-                  </div>
-                  <Progress value={passwordStrength.strength} className="h-1.5" />
-
-                  <div className="space-y-1.5 mt-3">
-                    {passwordRequirements.map((req, index) => (
-                      <div key={index} className="flex items-center gap-2 text-xs">
-                        {req.met ? (
-                          <Check className="h-3.5 w-3.5 text-green-400" />
-                        ) : (
-                          <X className="h-3.5 w-3.5 text-slate-600" />
-                        )}
-                        <span className={req.met ? 'text-slate-300' : 'text-slate-500'}>
-                          {req.text}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             <Button
